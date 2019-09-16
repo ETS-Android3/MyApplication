@@ -389,6 +389,9 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 		// Now create the UI.
 		// First create the document view
 		mDocView = new MuPDFReaderView(this) {
+			/**
+			 * 监听来自手势的切换页面动作
+			 * **/
 			@Override
 			protected void onMoveToChild(int i) {
 				if (core == null)
@@ -400,6 +403,9 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 				super.onMoveToChild(i);
 			}
 
+			/**
+			 * 点击空白处-展开与隐藏菜单
+			 * **/
 			@Override
 			protected void onTapMainDocArea() {
 				if (!mButtonsVisible) {
@@ -410,11 +416,17 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 				}
 			}
 
+			/**
+			 * 滑动页面时-隐藏菜单
+			 * **/
 			@Override
 			protected void onDocMotion() {
 				hideButtons();
 			}
 
+			/**
+			 * 监听菜单内按钮点击事件
+			 * **/
 			@Override
 			protected void onHit(Hit item) {
 				switch (mTopBarMode) {
@@ -440,8 +452,16 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 				}
 			}
 		};
+		/**
+		 * !important
+		 *
+		 * setAdapter适配器控件 定义一系列空的swiper-pager,然后填充数据进入
+		 * **/
 		mDocView.setAdapter(new MuPDFPageAdapter(this, this, core));
 
+		/**
+		 * 搜索任务
+		 * **/
 		mSearchTask = new SearchTask(this, core) {
 			@Override
 			protected void onTextFound(SearchTaskResult result) {

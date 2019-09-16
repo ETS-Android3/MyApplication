@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.artifex.mupdfdemo.MuPDFActivity"></activity>
+        <activity android:name="com.artifex.mupdfdemo.OutlineActivity"></activity>
     </application>
 
 </manifest>

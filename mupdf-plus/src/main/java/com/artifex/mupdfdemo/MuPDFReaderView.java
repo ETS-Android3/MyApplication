@@ -135,6 +135,10 @@ public class MuPDFReaderView extends ReaderView {
 		}
 	}
 
+	/**
+	 * 当 mMode 为 Viewing 时允许页面随手势移动
+	 * 否则禁止移动 以便用于绘制批注
+	 * **/
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {

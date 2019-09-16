@@ -623,8 +623,16 @@ public abstract class PageView extends ViewGroup {
             mEntire.layout(0, 0, w, h);
         }
 
+        /**
+         * 初始化时 mSearchView占满全屏
+         * 1。用于批注被选中时显示box
+         * 2。用于画批注保存前的预览图
+         * 3。feature 添加自定义文本的话得又加一层画布了或者svg也不错
+         * **/
         if (mSearchView != null) {
             mSearchView.layout(0, 0, w, h);
+            mSearchView.setBackgroundColor(0xFFF00000);
+            mSearchView.setAlpha((float) 0.5);
         }
 
         if (mPatchViewSize != null) {
