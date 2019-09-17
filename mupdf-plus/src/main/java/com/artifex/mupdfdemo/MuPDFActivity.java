@@ -87,8 +87,8 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 	private AlertDialog mAlertDialog;
 	private FilePicker mFilePicker;
 
-
-	public static ArrayList<HashMap> mFreetext;             //文本批注{x,y,size,page,type:"textBox"}
+	//文本批注{x,y,width,size,page,type:"textBox"}
+	public static ArrayList<HashMap> mFreetext = new ArrayList<HashMap>();
 
 	public void createAlertWaiter() {
 		mAlertsActive = true;
@@ -474,7 +474,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 					String _text = mFreeTextView.getText().toString().replace("\n", "");
 					if(!_text.equals("")){
 						MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-						pageView.addFreetextAnnotation(_left,_top,mFreeTextView.getText().toString());
+						pageView.addFreetextAnnotation(_left,_top,mFreeTextView.getWidth(),mFreeTextView.getText().toString());
 						mFreeTextView.setText("");
 					}
 
@@ -482,11 +482,11 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 						imm.hideSoftInputFromWindow(mFreeTextView.getWindowToken(), 0);
 				}else {
 					RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mFreeTextView.getLayoutParams();
-					lp.setMargins((int)x, (int)y,0,0);
+					lp.setMargins((int)x, (int)(y-mFreeTextView.getHeight()/2),0,0);
 					mFreeTextView.setLayoutParams(lp);
 					mFreeTextView.setVisibility(View.VISIBLE);
 					_left = x;
-					_top = y;
+					_top = y+15;
 					if (imm != null)
 						imm.showSoftInput(mFreeTextView, 0);
 				}

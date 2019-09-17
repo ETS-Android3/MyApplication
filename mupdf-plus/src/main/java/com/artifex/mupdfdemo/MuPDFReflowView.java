@@ -153,7 +153,7 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	public void releaseBitmaps() {
 	}
 
-	public void addFreetextAnnotation(float left, float top, String text) {
+	public void addFreetextAnnotation(float left, float top, float width, String text) {
 	}
 
 	@Override

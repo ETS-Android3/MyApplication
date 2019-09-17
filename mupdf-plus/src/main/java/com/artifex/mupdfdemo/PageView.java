@@ -13,6 +13,9 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Handler;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -432,15 +435,22 @@ public abstract class PageView extends ViewGroup {
                     // Work out current total scale factor
                     // from source to view
                     final float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
-                    Paint paint = new Paint();
+                    TextPaint textPaint = new TextPaint();
+                    textPaint.setAntiAlias(true);
 
                     if (MuPDFActivity.mFreetext.size()>0) {
-                        paint.setColor(FREETEXT_COLOR);
+                        textPaint.setColor(FREETEXT_COLOR);
                         for (int i = 0; i < MuPDFActivity.mFreetext.size(); i++) {
                             HashMap map = MuPDFActivity.mFreetext.get(i);
                             if((int)map.get("page") == getPage()){
-                                paint.setTextSize((float)map.get("size") * scale);
-                                canvas.drawText((String)map.get("text"), (float)map.get("x") * scale, (float)map.get("y") * scale, paint);
+
+                                textPaint.setTextSize((float)map.get("size") * scale);
+                                StaticLayout layout = new StaticLayout((String)map.get("text"), textPaint, (int)((int)map.get("width") * scale),
+                                        Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
+                                canvas.save();
+                                canvas.translate((float)map.get("x") * scale, ((float)(map.get("y"))-(float)map.get("size")/2) * scale);
+                                layout.draw(canvas);
+                                canvas.restore();
                             }
                         }
                     }
@@ -617,7 +627,7 @@ public abstract class PageView extends ViewGroup {
             mSearchView.invalidate();
     }
 
-    public void addFreetextAnnotation(float x, float y, String text){
+    public void addFreetextAnnotation(float x, float y, float width, String text){
         float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
         float docRelX = (x - getLeft()) / scale;
         float docRelY = (y - getTop()) / scale;
@@ -625,6 +635,7 @@ public abstract class PageView extends ViewGroup {
         map.put("type","textbox");
         map.put("x",docRelX);
         map.put("y",docRelY);
+        map.put("width",(int)width);
         map.put("text",text);
         map.put("size",50 / scale);
         map.put("page",getPage());
