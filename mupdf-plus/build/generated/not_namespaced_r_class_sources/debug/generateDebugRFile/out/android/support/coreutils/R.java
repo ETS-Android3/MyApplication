@@ -62,18 +62,18 @@ public final class R {
     public static final class drawable {
         private drawable() {}
 
-        public static int notification_action_background = 0x7f090071;
-        public static int notification_bg = 0x7f090072;
-        public static int notification_bg_low = 0x7f090073;
-        public static int notification_bg_low_normal = 0x7f090074;
-        public static int notification_bg_low_pressed = 0x7f090075;
-        public static int notification_bg_normal = 0x7f090076;
-        public static int notification_bg_normal_pressed = 0x7f090077;
-        public static int notification_icon_background = 0x7f090078;
-        public static int notification_template_icon_bg = 0x7f090079;
-        public static int notification_template_icon_low_bg = 0x7f09007a;
-        public static int notification_tile_bg = 0x7f09007b;
-        public static int notify_panel_notification_icon_bg = 0x7f09007c;
+        public static int notification_action_background = 0x7f090072;
+        public static int notification_bg = 0x7f090073;
+        public static int notification_bg_low = 0x7f090074;
+        public static int notification_bg_low_normal = 0x7f090075;
+        public static int notification_bg_low_pressed = 0x7f090076;
+        public static int notification_bg_normal = 0x7f090077;
+        public static int notification_bg_normal_pressed = 0x7f090078;
+        public static int notification_icon_background = 0x7f090079;
+        public static int notification_template_icon_bg = 0x7f09007a;
+        public static int notification_template_icon_low_bg = 0x7f09007b;
+        public static int notification_tile_bg = 0x7f09007c;
+        public static int notify_panel_notification_icon_bg = 0x7f09007d;
     }
     public static final class id {
         private id() {}
@@ -87,25 +87,25 @@ public final class R {
         public static int blocking = 0x7f0c0019;
         public static int chronometer = 0x7f0c0022;
         public static int forever = 0x7f0c0032;
-        public static int icon = 0x7f0c0036;
-        public static int icon_group = 0x7f0c0037;
-        public static int info = 0x7f0c0039;
-        public static int italic = 0x7f0c003b;
-        public static int line1 = 0x7f0c003d;
-        public static int line3 = 0x7f0c003e;
-        public static int normal = 0x7f0c0048;
-        public static int notification_background = 0x7f0c0049;
-        public static int notification_main_column = 0x7f0c004a;
-        public static int notification_main_column_container = 0x7f0c004b;
-        public static int right_icon = 0x7f0c0057;
-        public static int right_side = 0x7f0c0058;
-        public static int tag_transition_group = 0x7f0c0078;
-        public static int tag_unhandled_key_event_manager = 0x7f0c0079;
-        public static int tag_unhandled_key_listeners = 0x7f0c007a;
-        public static int text = 0x7f0c007b;
-        public static int text2 = 0x7f0c007c;
-        public static int time = 0x7f0c007f;
-        public static int title = 0x7f0c0080;
+        public static int icon = 0x7f0c0038;
+        public static int icon_group = 0x7f0c0039;
+        public static int info = 0x7f0c003b;
+        public static int italic = 0x7f0c003d;
+        public static int line1 = 0x7f0c003f;
+        public static int line3 = 0x7f0c0040;
+        public static int normal = 0x7f0c004a;
+        public static int notification_background = 0x7f0c004b;
+        public static int notification_main_column = 0x7f0c004c;
+        public static int notification_main_column_container = 0x7f0c004d;
+        public static int right_icon = 0x7f0c0059;
+        public static int right_side = 0x7f0c005a;
+        public static int tag_transition_group = 0x7f0c007a;
+        public static int tag_unhandled_key_event_manager = 0x7f0c007b;
+        public static int tag_unhandled_key_listeners = 0x7f0c007c;
+        public static int text = 0x7f0c007d;
+        public static int text2 = 0x7f0c007e;
+        public static int time = 0x7f0c0081;
+        public static int title = 0x7f0c0082;
     }
     public static final class integer {
         private integer() {}

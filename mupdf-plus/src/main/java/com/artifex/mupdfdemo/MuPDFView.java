@@ -30,4 +30,5 @@ public interface MuPDFView {
 	public void removeHq();
 	public void releaseResources();
 	public void releaseBitmaps();
+	public void addFreetextAnnotation(float left, float top, String text);
 }

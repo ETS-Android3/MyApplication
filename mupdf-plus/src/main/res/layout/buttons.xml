@@ -45,10 +45,21 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_centerVertical="true"
-				android:layout_toLeftOf="@+id/outlineButton"
+				android:layout_toLeftOf="@+id/freeTextButton"
 				android:contentDescription="@string/toggle_reflow_mode"
 				android:background="@drawable/button"
 				android:src="@drawable/ic_reflow" />
+
+			<ImageButton
+				android:id="@+id/freeTextButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_toLeftOf="@+id/outlineButton"
+				android:contentDescription="添加文本批注"
+				android:background="@drawable/button"
+				android:onClick="OnFreeTextButtonClick"
+				android:src="@drawable/ic_highlight" />
 
 			<ImageButton
 				android:id="@+id/outlineButton"
@@ -335,6 +346,17 @@
 				android:src="@drawable/ic_check" />
 		</RelativeLayout>
 		</ViewAnimator>
+
+	<!--添加文本批注-->
+	<EditText
+		android:id="@+id/freeText"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:padding="0dp"
+		android:minWidth="80dp"
+		android:textSize="25sp"
+		android:background="@drawable/freetext" />
+
 
 	<RelativeLayout
 		android:id="@+id/lowerButtons"

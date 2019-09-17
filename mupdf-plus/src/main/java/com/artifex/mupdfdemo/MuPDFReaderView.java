@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 public class MuPDFReaderView extends ReaderView {
-	enum Mode {Viewing, Selecting, Drawing}
+	enum Mode {Viewing, Selecting, Drawing, Freetexting}
 	private final Context mContext;
 	private boolean mLinksEnabled = false;
 	private Mode mMode = Mode.Viewing;
@@ -23,7 +23,8 @@ public class MuPDFReaderView extends ReaderView {
 
 	protected void onTapMainDocArea() {}
 	protected void onDocMotion() {}
-	protected void onHit(Hit item) {};
+	protected void onHit(Hit item) {}
+	protected void onFreetextAdd(float x, float y) {}
 
 	public void setLinksEnabled(boolean b) {
 		mLinksEnabled = b;
@@ -107,6 +108,8 @@ public class MuPDFReaderView extends ReaderView {
 					onTapMainDocArea();
 				}
 			}
+		}else if (mMode == Mode.Freetexting){
+			onFreetextAdd(e.getX(), e.getY());
 		}
 		return super.onSingleTapUp(e);
 	}

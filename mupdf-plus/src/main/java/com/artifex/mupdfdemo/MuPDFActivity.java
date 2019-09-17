@@ -1,6 +1,8 @@
 package com.artifex.mupdfdemo;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.Executor;
 
 import com.artifex.mupdfdemo.ReaderView.ViewMapper;
@@ -56,6 +58,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 	private View         mButtonsView;
 	private boolean      mButtonsVisible;
 	private EditText     mPasswordView;
+	private EditText     mFreeTextView;
 	private TextView     mFilenameView;
 	private SeekBar      mPageSlider;
 	private int          mPageSliderRes;
@@ -83,6 +86,9 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 	private AsyncTask<Void,Void,MuPDFAlert> mAlertTask;
 	private AlertDialog mAlertDialog;
 	private FilePicker mFilePicker;
+
+
+	public static ArrayList<HashMap> mFreetext;             //文本批注{x,y,size,page,type:"textBox"}
 
 	public void createAlertWaiter() {
 		mAlertsActive = true;
@@ -449,6 +455,40 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 					if (pageView != null)
 						pageView.deselectAnnotation();
 					break;
+				}
+			}
+
+			/**
+			 * 监听添加文本批注事件
+			 * **/
+			float _left;
+			float _top;
+			@Override
+			protected void onFreetextAdd(float x, float y) {
+				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				//再次点击画布时取消编辑并保存已键入的值
+				if(mFreeTextView.getVisibility() == View.VISIBLE){
+					mDocView.setMode(Mode.Viewing);
+					mFreeTextView.setVisibility(View.INVISIBLE);
+
+					String _text = mFreeTextView.getText().toString().replace("\n", "");
+					if(!_text.equals("")){
+						MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+						pageView.addFreetextAnnotation(_left,_top,mFreeTextView.getText().toString());
+						mFreeTextView.setText("");
+					}
+
+					if (imm != null)
+						imm.hideSoftInputFromWindow(mFreeTextView.getWindowToken(), 0);
+				}else {
+					RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mFreeTextView.getLayoutParams();
+					lp.setMargins((int)x, (int)y,0,0);
+					mFreeTextView.setLayoutParams(lp);
+					mFreeTextView.setVisibility(View.VISIBLE);
+					_left = x;
+					_top = y;
+					if (imm != null)
+						imm.showSoftInput(mFreeTextView, 0);
 				}
 			}
 		};
@@ -881,6 +921,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 	private void makeButtonsView() {
 		mButtonsView = getLayoutInflater().inflate(R.layout.buttons,null);
 		mFilenameView = (TextView)mButtonsView.findViewById(R.id.docNameText);
+		mFreeTextView = (EditText)mButtonsView.findViewById(R.id.freeText);
 		mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
 		mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);
 		mInfoView = (TextView)mButtonsView.findViewById(R.id.info);
@@ -899,6 +940,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 		mPageNumberView.setVisibility(View.INVISIBLE);
 		mInfoView.setVisibility(View.INVISIBLE);
 		mPageSlider.setVisibility(View.INVISIBLE);
+		mFreeTextView.setVisibility(View.INVISIBLE);
 	}
 
 	public void OnMoreButtonClick(View v) {
@@ -1053,6 +1095,12 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 			pageView.deselectAnnotation();
 		mTopBarMode = TopBarMode.Annot;
 		mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
+	}
+
+	//文本批注按钮
+	public void OnFreeTextButtonClick(View v){
+		showInfo("添加文本批注");
+		mDocView.setMode(MuPDFReaderView.Mode.Freetexting);
 	}
 
 	private void showKeyboard() {

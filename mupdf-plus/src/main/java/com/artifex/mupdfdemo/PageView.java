@@ -132,7 +132,6 @@ public abstract class PageView extends ViewGroup {
     private TextWord mText[][];
     private RectF mItemSelectBox;
     protected ArrayList<ArrayList<PointF>> mDrawing;    //墨迹批注临时数据
-    protected HashMap mFreetext;                     //文本批注定位地址
     private View mSearchView;
     private View mCustomerView;
     private boolean mIsBlank;
@@ -433,12 +432,17 @@ public abstract class PageView extends ViewGroup {
                     // Work out current total scale factor
                     // from source to view
                     final float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
-                    final Paint paint = new Paint();
+                    Paint paint = new Paint();
 
-                    if (mFreetext != null) {
+                    if (MuPDFActivity.mFreetext.size()>0) {
                         paint.setColor(FREETEXT_COLOR);
-                        paint.setTextSize(20 * scale);
-                        canvas.drawText((String) mFreetext.get("value"), (float)mFreetext.get("x") * scale, (float)mFreetext.get("y") * scale, paint);
+                        for (int i = 0; i < MuPDFActivity.mFreetext.size(); i++) {
+                            HashMap map = MuPDFActivity.mFreetext.get(i);
+                            if((int)map.get("page") == getPage()){
+                                paint.setTextSize((float)map.get("size") * scale);
+                                canvas.drawText((String)map.get("text"), (float)map.get("x") * scale, (float)map.get("y") * scale, paint);
+                            }
+                        }
                     }
                 }
             };
@@ -613,8 +617,19 @@ public abstract class PageView extends ViewGroup {
             mSearchView.invalidate();
     }
 
-    public void setFreetextObject(HashMap map){
-        mFreetext = map;
+    public void addFreetextAnnotation(float x, float y, String text){
+        float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+        float docRelX = (x - getLeft()) / scale;
+        float docRelY = (y - getTop()) / scale;
+        HashMap map = new HashMap();
+        map.put("type","textbox");
+        map.put("x",docRelX);
+        map.put("y",docRelY);
+        map.put("text",text);
+        map.put("size",50 / scale);
+        map.put("page",getPage());
+        MuPDFActivity.mFreetext.add(map);
+
         if (mCustomerView != null)
             mCustomerView.invalidate();
     }

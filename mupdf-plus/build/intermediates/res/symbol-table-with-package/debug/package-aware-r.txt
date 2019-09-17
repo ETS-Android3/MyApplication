@@ -585,6 +585,7 @@ drawable abc_vector_test
 drawable busy
 drawable button
 drawable darkdenim3
+drawable freetext
 drawable ic_annot
 drawable ic_annotation
 drawable ic_arrow_left
@@ -679,6 +680,8 @@ id end
 id expand_activities_button
 id expanded_menu
 id forever
+id freeText
+id freeTextButton
 id group_divider
 id highlightButton
 id home
