@@ -24,6 +24,7 @@ import com.artifex.utils.DigitalizedEventCallback;
 import com.artifex.utils.PdfBitmap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 // Make our ImageViews opaque to optimize redraw
@@ -96,8 +97,9 @@ class TextSelector {
 public abstract class PageView extends ViewGroup {
     private static final int HIGHLIGHT_COLOR = 0x802572AC;
     private static final int LINK_COLOR = 0x80AC7225;
-    private static final int BOX_COLOR = 0xFF4444FF;
+    private static final int BOX_COLOR = 0xFFFF0000;
     private static final int INK_COLOR = 0xFFFF0000;
+    private static final int FREETEXT_COLOR = 0xFFFF0000;
     private static final float INK_THICKNESS = 10.0f;
     private static final int BACKGROUND_COLOR = 0xFFFFFFFF;
     private static final int PROGRESS_DIALOG_DELAY = 200;
@@ -129,8 +131,10 @@ public abstract class PageView extends ViewGroup {
     private RectF mSelectBox;
     private TextWord mText[][];
     private RectF mItemSelectBox;
-    protected ArrayList<ArrayList<PointF>> mDrawing;
+    protected ArrayList<ArrayList<PointF>> mDrawing;    //墨迹批注临时数据
+    protected HashMap mFreetext;                     //文本批注定位地址
     private View mSearchView;
+    private View mCustomerView;
     private boolean mIsBlank;
     private boolean mHighlightLinks;
 
@@ -319,6 +323,9 @@ public abstract class PageView extends ViewGroup {
 
         if (mSearchView == null) {
             mSearchView = new View(mContext) {
+                /**
+                 * 监听temp_canvas层（mDrawing临时数据）画笔动作
+                 * **/
                 @Override
                 protected void onDraw(final Canvas canvas) {
                     super.onDraw(canvas);
@@ -363,6 +370,7 @@ public abstract class PageView extends ViewGroup {
                         });
                     }
 
+                    //批注外包盒子
                     if (mItemSelectBox != null) {
                         paint.setStyle(Paint.Style.STROKE);
                         paint.setColor(BOX_COLOR);
@@ -413,6 +421,28 @@ public abstract class PageView extends ViewGroup {
             };
 
             addView(mSearchView);
+        }
+        if(mCustomerView == null){
+            mCustomerView = new View(mContext) {
+                /**
+                 * 监听custom_view层【文本、其他】填充动作
+                 * **/
+                @Override
+                protected void onDraw(final Canvas canvas) {
+                    super.onDraw(canvas);
+                    // Work out current total scale factor
+                    // from source to view
+                    final float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+                    final Paint paint = new Paint();
+
+                    if (mFreetext != null) {
+                        paint.setColor(FREETEXT_COLOR);
+                        paint.setTextSize(20 * scale);
+                        canvas.drawText((String) mFreetext.get("value"), (float)mFreetext.get("x") * scale, (float)mFreetext.get("y") * scale, paint);
+                    }
+                }
+            };
+            addView(mCustomerView);
         }
         requestLayout();
     }
@@ -583,6 +613,12 @@ public abstract class PageView extends ViewGroup {
             mSearchView.invalidate();
     }
 
+    public void setFreetextObject(HashMap map){
+        mFreetext = map;
+        if (mCustomerView != null)
+            mCustomerView.invalidate();
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int x, y;
@@ -627,12 +663,13 @@ public abstract class PageView extends ViewGroup {
          * 初始化时 mSearchView占满全屏
          * 1。用于批注被选中时显示box
          * 2。用于画批注保存前的预览图
-         * 3。feature 添加自定义文本的话得又加一层画布了或者svg也不错
+         * 3。feature 添加自定义文本的话得又加一层画布了或者 svg也不错
          * **/
         if (mSearchView != null) {
             mSearchView.layout(0, 0, w, h);
-            mSearchView.setBackgroundColor(0xFFF00000);
-            mSearchView.setAlpha((float) 0.5);
+        }
+        if(mCustomerView != null) {
+            mCustomerView.layout(0, 0, w, h);
         }
 
         if (mPatchViewSize != null) {
@@ -659,111 +696,72 @@ public abstract class PageView extends ViewGroup {
 
     private boolean flagHQ = false;
     public void updateHq(boolean update) {
-        if(!flagHQ) {
-            flagHQ = true;
-            Rect viewArea = new Rect(getLeft(), getTop(), getRight(), getBottom());
-
-            if (viewArea.width() == mSize.x || viewArea.height() == mSize.y) {
-                // If the viewArea's size matches the unzoomed size, there is no need for an hq patch
-                if (mPatch != null) {
-                    mPatch.setImageBitmap(null);
-                    mPatch.invalidate();
-                }
-                flagHQ = false;
-            } else {
-                final Point patchViewSize = new Point(viewArea.width(), viewArea.height());
-                final Rect patchArea = new Rect(0, 0, mParentSize.x, mParentSize.y);
-
-                // Intersect and test that there is an intersection
-                if (!patchArea.intersect(viewArea)) {
-                    flagHQ = false;
-                    return;
-                }
-
-                // Offset patch area to be relative to the view top left
-                patchArea.offset(-viewArea.left, -viewArea.top);
-
-                boolean area_unchanged = patchArea.equals(mPatchArea) && patchViewSize.equals(mPatchViewSize);
-
-                // If being asked for the same area as last time and not because of an update then nothing to do
-//            if (area_unchanged && !update)
-//                return;
-//
-//            boolean completeRedraw = !(area_unchanged && update);
-                boolean completeRedraw = !area_unchanged || update;
-
-                // Stop the drawing of previous patch if still going
-                if (mDrawPatch != null) {
-                    mDrawPatch.cancelAndWait();
-                    mDrawPatch = null;
-                }
-
-                // Create and add the image view if not already done
-                if (mPatch == null) {
-                    mPatch = new OpaqueImageView(mContext);
-                    mPatch.setScaleType(ImageView.ScaleType.MATRIX);
-                    addView(mPatch);
-                    if (mSearchView != null) {
-                        mSearchView.bringToFront();
-                    }
-                }
-
-                CancellableTaskDefinition<Void, Void> task;
-
-                final Bitmap oldPatchBm = mPatchBm;
-                try {
-                    int mPatchAreaHeight = patchArea.bottom - patchArea.top;
-                    int mPatchAreaWidth = patchArea.right - patchArea.left;
-                    mPatchBm = Bitmap.createBitmap(mPatchAreaWidth, mPatchAreaHeight, Bitmap.Config.ARGB_8888);
-                    Log.i(TAG, "Recycle oldPatchBm on updateHQ: " + oldPatchBm);
-                    cancelDraw();
-                } catch (OutOfMemoryError e) {
-                    Log.e(TAG, e.getMessage(), e);
-                    flagHQ = false;
-                }
-
-                if (completeRedraw)
-                    task = getDrawPageTask(mPatchBm, patchViewSize.x, patchViewSize.y,
-                            patchArea.left, patchArea.top,
-                            patchArea.width(), patchArea.height());
-                else
-                    task = getUpdatePageTask(mPatchBm, patchViewSize.x, patchViewSize.y,
-                            patchArea.left, patchArea.top,
-                            patchArea.width(), patchArea.height());
-
-                mDrawPatch = new CancellableAsyncTask<Void, Void>(task) {
-
-                    @Override
-                    public void cancelAndWait() {
-                        super.cancelAndWait();
-                        flagHQ = false;
-                    }
-
-                    public void onPostExecute(Void result) {
-                        mPatchViewSize = patchViewSize;
-                        mPatchArea = patchArea;
-
-                        if (mPatchBm != null && !mPatchBm.isRecycled()) {
-                            Canvas zoomedCanvas = new Canvas(mPatchBm);
-                            drawBitmaps(zoomedCanvas, mPatchViewSize, mPatchArea);
-                            mPatch.setImageBitmap(mPatchBm);
-                            mPatch.invalidate();
-                        }
-
-                        //requestLayout();
-                        // Calling requestLayout here doesn't lead to a later call to layout. No idea
-                        // why, but apparently others have run into the problem.
-                        mPatch.layout(mPatchArea.left, mPatchArea.top, mPatchArea.right, mPatchArea.bottom);
-
-                        if (mPatchBm != null && !mPatchBm.equals(oldPatchBm)) {
-                            recycleBitmap(oldPatchBm);
-                        }
-                        flagHQ = false;
-                    }
-                };
-
-                mDrawPatch.execute();
+        Rect viewArea = new Rect(getLeft(), getTop(), getRight(), getBottom());
+        if (viewArea.width() == mSize.x || viewArea.height() == mSize.y) {
+            // If the viewArea's size matches the unzoomed size, there is no need for an hq patch
+            if (mPatch != null) {
+                mPatch.setImageBitmap(null);
+                mPatch.invalidate();
             }
+        } else {
+            final Point patchViewSize = new Point(viewArea.width(), viewArea.height());
+            final Rect patchArea = new Rect(0, 0, mParentSize.x, mParentSize.y);
+
+            // Intersect and test that there is an intersection
+            if (!patchArea.intersect(viewArea))
+                return;
+
+            // Offset patch area to be relative to the view top left
+            patchArea.offset(-viewArea.left, -viewArea.top);
+
+            boolean area_unchanged = patchArea.equals(mPatchArea) && patchViewSize.equals(mPatchViewSize);
+
+            // If being asked for the same area as last time and not because of an update then nothing to do
+            if (area_unchanged && !update)
+                return;
+
+            boolean completeRedraw = !(area_unchanged);
+
+            // Stop the drawing of previous patch if still going
+            if (mDrawPatch != null) {
+                mDrawPatch.cancelAndWait();
+                mDrawPatch = null;
+            }
+
+            // Create and add the image view if not already done
+            if (mPatch == null) {
+                mPatch = new OpaqueImageView(mContext);
+                mPatch.setScaleType(ImageView.ScaleType.MATRIX);
+                addView(mPatch);
+                mSearchView.bringToFront();
+            }
+
+            CancellableTaskDefinition<Void, Void> task;
+
+            if (completeRedraw)
+                task = getDrawPageTask(mPatchBm, patchViewSize.x, patchViewSize.y,
+                        patchArea.left, patchArea.top,
+                        patchArea.width(), patchArea.height());
+            else
+                task = getUpdatePageTask(mPatchBm, patchViewSize.x, patchViewSize.y,
+                        patchArea.left, patchArea.top,
+                        patchArea.width(), patchArea.height());
+
+            mDrawPatch = new CancellableAsyncTask<Void, Void>(task) {
+
+                public void onPostExecute(Void result) {
+                    mPatchViewSize = patchViewSize;
+                    mPatchArea = patchArea;
+                    mPatch.setImageBitmap(mPatchBm);
+                    mPatch.invalidate();
+                    //requestLayout();
+                    // Calling requestLayout here doesn't lead to a later call to layout. No idea
+                    // why, but apparently others have run into the problem.
+                    mPatch.layout(mPatchArea.left, mPatchArea.top, mPatchArea.right, mPatchArea.bottom);
+                }
+            };
+
+            mDrawPatch.execute();
         }
     }
 

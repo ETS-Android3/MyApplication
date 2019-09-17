@@ -1,5 +1,20 @@
-# Canvas
+# 项目目录导视图
 
-com.artifex.mupdfdemo.PageView.java
+## Swiper Adapter
 
-`setPage` `p.368`
+ - BaseAdapter
+ -    ⬇️(extends)
+ - MuPDFPageAdapter
+ -    ⬇️
+ - ImageView
+
+## ImageView
+
+ - OpaqueImageView(mEntire)
+ -    ⬇️
+ - ViewGroup
+ -    ⬇️
+ - PageView
+ -    ⬇️
+ - MuPDFPageView
+

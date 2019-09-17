@@ -1,6 +1,7 @@
 package com.artifex.mupdfdemo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.artifex.mupdfdemo.MuPDFCore.Cookie;
 
@@ -320,6 +321,12 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		boolean hit = false;
 		int i;
 
+		HashMap<Object,Object> map = new HashMap<Object,Object>();
+		map.put("x",docRelX);
+		map.put("y",docRelY);
+		map.put("value","我太难了");
+		setFreetextObject(map);
+
 		if (mAnnotations != null) {
 			for (i = 0; i < mAnnotations.length; i++)
 				if (mAnnotations[i].contains(docRelX, docRelY)) {
@@ -337,6 +344,12 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 					mSelectedAnnotationIndex = i;
 					setItemSelectBox(mAnnotations[i]);
 					return Hit.Annotation;
+				case FREETEXT:
+//					HashMap<Object,Object> map = new HashMap<Object,Object>();
+//					map.put("x",docRelX);
+//					map.put("y",docRelY);
+//					map.put("value","我太难了");
+//					setFreetextObject(map);
 				}
 			}
 		}

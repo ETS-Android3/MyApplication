@@ -41,6 +41,9 @@ public class MuPDFPageAdapter extends BaseAdapter {
 		return 0;
 	}
 
+	/**
+	 * 为Swiper适配器注入数据
+	 * **/
 	public View getView(final int position, View convertView, ViewGroup parent) {
 
         final MuPDFPageView pageView;
