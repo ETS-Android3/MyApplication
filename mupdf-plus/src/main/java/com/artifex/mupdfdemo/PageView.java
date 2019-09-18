@@ -622,6 +622,9 @@ public abstract class PageView extends ViewGroup {
     }
 
     public void setItemSelectBox(RectF rect) {
+        /**
+         * LUOKUN UNDO:在这里动态添加mBookNotePopArrowsdown view
+         * **/
         mItemSelectBox = rect;
         if (mSearchView != null)
             mSearchView.invalidate();

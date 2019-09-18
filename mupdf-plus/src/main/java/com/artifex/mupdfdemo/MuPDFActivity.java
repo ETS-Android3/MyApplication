@@ -33,6 +33,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -60,6 +61,8 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 	private boolean      mButtonsVisible;
 	private EditText     mPasswordView;
 	private EditText     mFreeTextView;
+	private RelativeLayout mBookNotePop;
+	private ImageView	 mBookNotePopArrowsdown;
 	private TextView     mFilenameView;
 	private SeekBar      mPageSlider;
 	private int          mPageSliderRes;
@@ -470,6 +473,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
                 if(mFreeTextView.getVisibility() == View.VISIBLE){
                     mDocView.setMode(Mode.Viewing);
 					mFreeTextView.setVisibility(View.INVISIBLE);
+                    mBookNotePop.setVisibility(View.INVISIBLE);
 
 					String _text = mFreeTextView.getText().toString().replace("\n", "");
 					MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
@@ -524,6 +528,25 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
                 mFreeTextView.setText((String)_map.get("text"));
 				mFreeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,(float)_map.get("size")*pageView.getScale());
                 mFreeTextView.setVisibility(View.VISIBLE);
+
+//				if(x<mBookNotePop.getMeasuredWidth()/2) {
+//                    mBookNotePop.setX(0);
+//                }else if((mDocView.getWidth() - x) <  mBookNotePop.getMeasuredWidth()/2){
+//                    mBookNotePop.setX(mDocView.getWidth() - mBookNotePop.getMeasuredWidth());
+//                }else {
+//                    mBookNotePop.setX(x-mBookNotePop.getMeasuredWidth()/2);
+//                }
+//
+//				if(y<mBookNotePop.getMeasuredHeight()){
+//                    mBookNotePop.setY(0);
+//                }else if((mDocView.getHeight() - y) <  mBookNotePop.getMeasuredHeight()){
+//                    mBookNotePop.setY(mDocView.getHeight() - mBookNotePop.getMeasuredHeight());
+//                }else {
+//					int arrowDownIconHeight = 20;
+//                    mBookNotePop.setY(y-arrowDownIconHeight);
+//                }
+//                mBookNotePop.setVisibility(View.VISIBLE);
+//				mBookNotePopArrowsdown.setX(x);
 
 				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 				if (imm != null)
@@ -960,6 +983,8 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 		mButtonsView = getLayoutInflater().inflate(R.layout.buttons,null);
 		mFilenameView = (TextView)mButtonsView.findViewById(R.id.docNameText);
 		mFreeTextView = (EditText)mButtonsView.findViewById(R.id.freeText);
+		mBookNotePop = (RelativeLayout)mButtonsView.findViewById(R.id.booknotepop);
+		mBookNotePopArrowsdown = (ImageView)mBookNotePop.findViewById(R.id.iv_popbooknotearrowsdown);
 		mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
 		mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);
 		mInfoView = (TextView)mButtonsView.findViewById(R.id.info);
@@ -980,6 +1005,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 		mPageSlider.setVisibility(View.INVISIBLE);
 		mFreeTextView.setVisibility(View.INVISIBLE);
         mFreeTextView.measure(0,0);
+		mBookNotePop.setVisibility(View.INVISIBLE);
 	}
 
 	public void OnMoreButtonClick(View v) {

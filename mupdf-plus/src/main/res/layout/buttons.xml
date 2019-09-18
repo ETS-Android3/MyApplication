@@ -345,18 +345,8 @@
 				android:onClick="OnAcceptButtonClick"
 				android:src="@drawable/ic_check" />
 		</RelativeLayout>
-		</ViewAnimator>
 
-	<!--添加文本批注-->
-	<EditText
-		android:id="@+id/freeText"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:minWidth="80dp"
-		android:padding="0dp"
-		android:layout_margin="0dp"
-		android:background="@drawable/freetext" />
-
+	</ViewAnimator>
 
 	<RelativeLayout
 		android:id="@+id/lowerButtons"
@@ -404,4 +394,18 @@
 		android:background="@drawable/page_num"
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:textColor="#FFFFFF" />
+
+	<!--添加文本批注-->
+	<EditText
+		android:id="@+id/freeText"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:minWidth="80dp"
+		android:padding="0dp"
+		android:layout_margin="0dp"
+		android:background="@drawable/freetext" />
+
+	<include
+		android:id="@+id/booknotepop"
+		layout="@layout/booknotepop" />
 </RelativeLayout>
