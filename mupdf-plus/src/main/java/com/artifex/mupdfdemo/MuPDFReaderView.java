@@ -162,7 +162,13 @@ public class MuPDFReaderView extends ReaderView {
 		// Not sure why this is needed, but without it
 		// pinch zoom can make the buttons appear
 		tapDisabled = true;
-		return super.onScaleBegin(d);
+		switch (mMode) {
+		case Freetexting:
+			return false;
+		default:
+			return super.onScaleBegin(d);
+		}
+
 	}
 
 	public boolean onTouchEvent(MotionEvent event) {

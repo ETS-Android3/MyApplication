@@ -412,7 +412,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 			PointF p = new PointF(docRelX, docRelY);
 
-			if (IsPointInMatrix(p1,p2,p3,p4,p)) {
+			if (IsPointInMatrix(p1,p2,p3,p4,p)&&mPageNumber == (int)map.get("page")) {
 				mFreetextIndex = t;
 				return Hit.FreeText;
 			}
