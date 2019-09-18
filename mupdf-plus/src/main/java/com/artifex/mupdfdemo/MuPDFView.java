@@ -3,7 +3,9 @@ package com.artifex.mupdfdemo;
 import android.graphics.PointF;
 import android.graphics.RectF;
 
-enum Hit {Nothing, Widget, Annotation};
+import java.util.HashMap;
+
+enum Hit {Nothing, Widget, Annotation, FreeText};
 
 public interface MuPDFView {
 	public void setPage(int page, PointF size);
@@ -30,5 +32,15 @@ public interface MuPDFView {
 	public void removeHq();
 	public void releaseResources();
 	public void releaseBitmaps();
-	public void addFreetextAnnotation(float left, float top, float width, String text);
+	/**
+	 * 矩形区域
+	 *
+	 * 四个坐标点：{x,y} {x,y+height} {x+width,y} {x+width,y+height}
+	 * **/
+	public void addFreetextAnnotation(float x, float y, float width, float height, String text);
+	public void addFreetextAnnotation(HashMap map);
+	public int getFreetextIndex();
+	public float getScale();
+	public int getTop();
+	public int getLeft();
 }

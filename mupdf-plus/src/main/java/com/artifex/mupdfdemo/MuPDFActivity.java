@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -86,9 +87,6 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 	private AsyncTask<Void,Void,MuPDFAlert> mAlertTask;
 	private AlertDialog mAlertDialog;
 	private FilePicker mFilePicker;
-
-	//文本批注{x,y,width,size,page,type:"textBox"}
-	public static ArrayList<HashMap> mFreetext = new ArrayList<HashMap>();
 
 	public void createAlertWaiter() {
 		mAlertsActive = true;
@@ -463,33 +461,73 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 			 * **/
 			float _left;
 			float _top;
+			HashMap _map;
+			float free_text_font_size = 50;
 			@Override
 			protected void onFreetextAdd(float x, float y) {
 				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 				//再次点击画布时取消编辑并保存已键入的值
-				if(mFreeTextView.getVisibility() == View.VISIBLE){
-					mDocView.setMode(Mode.Viewing);
+                if(mFreeTextView.getVisibility() == View.VISIBLE){
+                    mDocView.setMode(Mode.Viewing);
 					mFreeTextView.setVisibility(View.INVISIBLE);
 
 					String _text = mFreeTextView.getText().toString().replace("\n", "");
+					MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+
 					if(!_text.equals("")){
-						MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-						pageView.addFreetextAnnotation(_left,_top,mFreeTextView.getWidth(),mFreeTextView.getText().toString());
-						mFreeTextView.setText("");
+						if(_map != null) {
+							_map.put("text",_text);
+							_map.put("width",(float)mFreeTextView.getMeasuredWidth());
+							_map.put("height",(float)mFreeTextView.getMeasuredHeight());
+							pageView.addFreetextAnnotation(_map);
+						}else {
+                            pageView.addFreetextAnnotation(_left,_top,(float)mFreeTextView.getMeasuredWidth(),(float)mFreeTextView.getMeasuredHeight(),mFreeTextView.getText().toString());
+                        }
 					}
+
+					mFreeTextView.setText("");
+					_map = null;
 
 					if (imm != null)
 						imm.hideSoftInputFromWindow(mFreeTextView.getWindowToken(), 0);
 				}else {
 					RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mFreeTextView.getLayoutParams();
-					lp.setMargins((int)x, (int)(y-mFreeTextView.getHeight()/2),0,0);
+					lp.setMargins((int)x, (int)y,0,0);
 					mFreeTextView.setLayoutParams(lp);
+					mFreeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,free_text_font_size);
 					mFreeTextView.setVisibility(View.VISIBLE);
 					_left = x;
-					_top = y+15;
+					_top = y;
+
 					if (imm != null)
 						imm.showSoftInput(mFreeTextView, 0);
 				}
+			}
+
+			/**
+			 * 监听文本批注点击事件
+			 * 被点击之后文本删除并还原成EditText
+			 *
+			 * @param index mFreeText数组的索引
+			 * **/
+			@Override
+			protected void onFreetextClick(int index) {
+				_map = MuPDFFreeTextData.mFreetext.get(index);
+				MuPDFFreeTextData.mFreetext.remove(index);
+				float x = (float)_map.get("x");
+				float y = (float)_map.get("y");
+
+				MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+				RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mFreeTextView.getLayoutParams();
+				lp.setMargins((int)(x*pageView.getScale())+pageView.getLeft(), (int)(y*pageView.getScale())+pageView.getTop(),0,0);
+				mFreeTextView.setLayoutParams(lp);
+                mFreeTextView.setText((String)_map.get("text"));
+				mFreeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,(float)_map.get("size")*pageView.getScale());
+                mFreeTextView.setVisibility(View.VISIBLE);
+
+				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				if (imm != null)
+					imm.showSoftInput(mFreeTextView, 0);
 			}
 		};
 		/**
@@ -941,6 +979,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 		mInfoView.setVisibility(View.INVISIBLE);
 		mPageSlider.setVisibility(View.INVISIBLE);
 		mFreeTextView.setVisibility(View.INVISIBLE);
+        mFreeTextView.measure(0,0);
 	}
 
 	public void OnMoreButtonClick(View v) {

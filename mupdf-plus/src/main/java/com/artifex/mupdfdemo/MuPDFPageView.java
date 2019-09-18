@@ -113,6 +113,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	private AsyncTask<Void,Void,String> mCheckSignature;
 	private AsyncTask<Void,Void,Boolean> mSign;
 	private Runnable changeReporter;
+	public int mFreetextIndex;
 
 	public MuPDFPageView(Context c, FilePicker.FilePickerSupport filePickerSupport, MuPDFCore core, Point parentSize, MuPDFPageAdapter adapter) {
 		super(c, parentSize, adapter);
@@ -320,6 +321,8 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		final float docRelY = (y - getTop())/scale;
 		boolean hit = false;
 		int i;
+		int t;
+		mFreetextIndex = -1;
 
 		if (mAnnotations != null) {
 			for (i = 0; i < mAnnotations.length; i++)
@@ -400,7 +403,39 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			return Hit.Widget;
 		}
 
+		for (t=0;t < MuPDFFreeTextData.mFreetext.size(); t++) {
+			HashMap map = MuPDFFreeTextData.mFreetext.get(t);
+			PointF p1 = new PointF((float)map.get("x"),(float)map.get("y"));
+			PointF p2 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y"));
+			PointF p3 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
+			PointF p4 = new PointF((float)map.get("x"),(float)map.get("y")+(float)map.get("height"));
+
+			PointF p = new PointF(docRelX, docRelY);
+
+			if (IsPointInMatrix(p1,p2,p3,p4,p)) {
+				mFreetextIndex = t;
+				return Hit.FreeText;
+			}
+		}
+
 		return Hit.Nothing;
+	}
+
+	public int getFreetextIndex(){
+		return mFreetextIndex;
+	}
+
+	/**
+	 * 判断点是否在一个矩形内
+	 * **/
+	boolean IsPointInMatrix(PointF p1,PointF p2,PointF p3,PointF p4,PointF p){
+		return GetCross(p1, p2, p) * GetCross(p3, p4, p) >= 0 && GetCross(p2, p3, p) * GetCross(p4, p1, p) >= 0;
+	}
+	/**
+	 * IsPointInMatrix辅助函数
+	 * **/
+	float GetCross(PointF p1,PointF p2, PointF p){
+		return (p2.x - p1.x) * (p.y - p1.y) - (p.x - p1.x) * (p2.y - p1.y);
 	}
 
 	@TargetApi(11)
@@ -649,6 +684,10 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	public void setScale(float scale) {
 		// This type of view scales automatically to fit the size
 		// determined by the parent view groups during layout
+	}
+
+	public float getScale(){
+		return mSourceScale*(float)getWidth()/(float)mSize.x;
 	}
 
 	@Override

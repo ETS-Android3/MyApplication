@@ -438,17 +438,17 @@ public abstract class PageView extends ViewGroup {
                     TextPaint textPaint = new TextPaint();
                     textPaint.setAntiAlias(true);
 
-                    if (MuPDFActivity.mFreetext.size()>0) {
+                    if (MuPDFFreeTextData.mFreetext.size()>0) {
                         textPaint.setColor(FREETEXT_COLOR);
-                        for (int i = 0; i < MuPDFActivity.mFreetext.size(); i++) {
-                            HashMap map = MuPDFActivity.mFreetext.get(i);
+                        for (int i = 0; i < MuPDFFreeTextData.mFreetext.size(); i++) {
+                            HashMap map = MuPDFFreeTextData.mFreetext.get(i);
                             if((int)map.get("page") == getPage()){
 
                                 textPaint.setTextSize((float)map.get("size") * scale);
-                                StaticLayout layout = new StaticLayout((String)map.get("text"), textPaint, (int)((int)map.get("width") * scale),
+                                StaticLayout layout = new StaticLayout((String)map.get("text"), textPaint, (int)((float)map.get("width") * scale),
                                         Layout.Alignment.ALIGN_NORMAL, 1.0F, 0.0F, true);
                                 canvas.save();
-                                canvas.translate((float)map.get("x") * scale, ((float)(map.get("y"))-(float)map.get("size")/2) * scale);
+                                canvas.translate((float)map.get("x") * scale, (float)map.get("y") * scale);
                                 layout.draw(canvas);
                                 canvas.restore();
                             }
@@ -627,7 +627,7 @@ public abstract class PageView extends ViewGroup {
             mSearchView.invalidate();
     }
 
-    public void addFreetextAnnotation(float x, float y, float width, String text){
+    public void addFreetextAnnotation(float x, float y, float width, float height, String text){
         float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
         float docRelX = (x - getLeft()) / scale;
         float docRelY = (y - getTop()) / scale;
@@ -635,15 +635,25 @@ public abstract class PageView extends ViewGroup {
         map.put("type","textbox");
         map.put("x",docRelX);
         map.put("y",docRelY);
-        map.put("width",(int)width);
+        map.put("width",width);
+        map.put("height",height);
         map.put("text",text);
         map.put("size",50 / scale);
         map.put("page",getPage());
-        MuPDFActivity.mFreetext.add(map);
+        map.put("scale",scale);
+        MuPDFFreeTextData.mFreetext.add(map);
 
         if (mCustomerView != null)
             mCustomerView.invalidate();
     }
+
+    public void addFreetextAnnotation(HashMap map){
+        MuPDFFreeTextData.mFreetext.add(map);
+        float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+        if (mCustomerView != null)
+            mCustomerView.invalidate();
+    }
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
