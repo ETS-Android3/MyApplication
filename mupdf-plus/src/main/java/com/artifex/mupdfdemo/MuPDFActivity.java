@@ -61,7 +61,7 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 	private boolean      mButtonsVisible;
 	private EditText     mPasswordView;
 	private EditText     mFreeTextView;
-	private RelativeLayout mBookNotePop;
+	public static RelativeLayout mBookNotePop;
 	private ImageView	 mBookNotePopArrowsdown;
 	private TextView     mFilenameView;
 	private SeekBar      mPageSlider;

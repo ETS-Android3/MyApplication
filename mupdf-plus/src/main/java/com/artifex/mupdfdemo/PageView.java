@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.artifex.utils.DigitalizedEventCallback;
 import com.artifex.utils.PdfBitmap;
@@ -623,8 +624,14 @@ public abstract class PageView extends ViewGroup {
 
     public void setItemSelectBox(RectF rect) {
         /**
-         * LUOKUN UNDO:在这里动态添加mBookNotePopArrowsdown view
+         * LUOKUN UNDO:这里设计mBookNotePop为静态变量不好
+         * 有没有直接在ViewGroup内动态addView的方法呢？
          * **/
+        if(rect != null){
+            MuPDFActivity.mBookNotePop.setVisibility(View.VISIBLE);
+        }else {
+            MuPDFActivity.mBookNotePop.setVisibility(View.INVISIBLE);
+        }
         mItemSelectBox = rect;
         if (mSearchView != null)
             mSearchView.invalidate();
