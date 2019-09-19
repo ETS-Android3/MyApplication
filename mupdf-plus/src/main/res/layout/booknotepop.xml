@@ -3,19 +3,10 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/iv_popbooknotearrowsup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@null"
-        android:src="@mipmap/popwindowarrowsup"
-        android:visibility="invisible" />
-
     <LinearLayout
         android:id="@+id/lly_popbooknotemain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/iv_popbooknotearrowsup"
         android:background="@drawable/selecttextpopstyle"
         android:paddingRight="8dp"
         android:paddingLeft="8dp"
@@ -61,6 +52,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="10dp"
+            android:onClick="onBookNotePopAppearanceClick"
             android:layout_weight="1">
 
             <TextView
@@ -125,6 +117,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="10dp"
+            android:onClick="OnDeleteButtonClick"
             android:layout_weight="1">
 
             <TextView
@@ -180,14 +173,5 @@
                 android:textSize="15dp" />
         </RelativeLayout>
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/iv_popbooknotearrowsdown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/lly_popbooknotemain"
-        android:contentDescription="@null"
-        android:src="@mipmap/popwindowarrowsdown"
-        android:visibility="visible" />
 
 </RelativeLayout>

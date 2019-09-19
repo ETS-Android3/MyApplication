@@ -62,7 +62,6 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 	private EditText     mPasswordView;
 	private EditText     mFreeTextView;
 	public static RelativeLayout mBookNotePop;
-	private ImageView	 mBookNotePopArrowsdown;
 	private TextView     mFilenameView;
 	private SeekBar      mPageSlider;
 	private int          mPageSliderRes;
@@ -529,25 +528,6 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 				mFreeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,(float)_map.get("size")*pageView.getScale());
                 mFreeTextView.setVisibility(View.VISIBLE);
 
-//				if(x<mBookNotePop.getMeasuredWidth()/2) {
-//                    mBookNotePop.setX(0);
-//                }else if((mDocView.getWidth() - x) <  mBookNotePop.getMeasuredWidth()/2){
-//                    mBookNotePop.setX(mDocView.getWidth() - mBookNotePop.getMeasuredWidth());
-//                }else {
-//                    mBookNotePop.setX(x-mBookNotePop.getMeasuredWidth()/2);
-//                }
-//
-//				if(y<mBookNotePop.getMeasuredHeight()){
-//                    mBookNotePop.setY(0);
-//                }else if((mDocView.getHeight() - y) <  mBookNotePop.getMeasuredHeight()){
-//                    mBookNotePop.setY(mDocView.getHeight() - mBookNotePop.getMeasuredHeight());
-//                }else {
-//					int arrowDownIconHeight = 20;
-//                    mBookNotePop.setY(y-arrowDownIconHeight);
-//                }
-//                mBookNotePop.setVisibility(View.VISIBLE);
-//				mBookNotePopArrowsdown.setX(x);
-
 				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 				if (imm != null)
 					imm.showSoftInput(mFreeTextView, 0);
@@ -984,7 +964,6 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 		mFilenameView = (TextView)mButtonsView.findViewById(R.id.docNameText);
 		mFreeTextView = (EditText)mButtonsView.findViewById(R.id.freeText);
 		mBookNotePop = (RelativeLayout)mButtonsView.findViewById(R.id.booknotepop);
-		mBookNotePopArrowsdown = (ImageView)mBookNotePop.findViewById(R.id.iv_popbooknotearrowsdown);
 		mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);
 		mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);
 		mInfoView = (TextView)mButtonsView.findViewById(R.id.info);
@@ -1260,5 +1239,9 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 		Intent intent = new Intent(this, ChoosePDFActivity.class);
 		intent.setAction(ChoosePDFActivity.PICK_KEY_FILE);
 		startActivityForResult(intent, FILEPICK_REQUEST);
+	}
+
+	public void onBookNotePopAppearanceClick(View v){
+
 	}
 }

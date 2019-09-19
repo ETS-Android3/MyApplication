@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.artifex.utils.DigitalizedEventCallback;
 import com.artifex.utils.PdfBitmap;
@@ -624,11 +623,27 @@ public abstract class PageView extends ViewGroup {
 
     public void setItemSelectBox(RectF rect) {
         /**
-         * LUOKUN UNDO:这里设计mBookNotePop为静态变量不好
-         * 有没有直接在ViewGroup内动态addView的方法呢？
+         * 显示菜单框
          * **/
         if(rect != null){
             MuPDFActivity.mBookNotePop.setVisibility(View.VISIBLE);
+            float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
+            float docRelX = rect.left * scale + getLeft();
+            float docRelY = rect.top * scale + getTop();
+
+            if(docRelX<0){
+                MuPDFActivity.mBookNotePop.setX(0);
+            }else if(getWidth()/scale - docRelX <  MuPDFActivity.mBookNotePop.getMeasuredWidth()){
+                MuPDFActivity.mBookNotePop.setX(getWidth()/scale-MuPDFActivity.mBookNotePop.getMeasuredWidth());
+            }else {
+                MuPDFActivity.mBookNotePop.setX(docRelX);
+            }
+
+            if(docRelY<MuPDFActivity.mBookNotePop.getMeasuredHeight()){
+                MuPDFActivity.mBookNotePop.setY((rect.bottom-rect.top) * scale+docRelY);
+            }else {
+                MuPDFActivity.mBookNotePop.setY(docRelY-MuPDFActivity.mBookNotePop.getMeasuredHeight());
+            }
         }else {
             MuPDFActivity.mBookNotePop.setVisibility(View.INVISIBLE);
         }
@@ -1199,5 +1214,4 @@ public abstract class PageView extends ViewGroup {
             }
         }
     }
-
 }

@@ -415,10 +415,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			if (IsPointInMatrix(p1,p2,p3,p4,p)&&mPageNumber == (int)map.get("page")) {
 				mFreetextIndex = t;
 				RectF rect = new RectF();
-				rect.left = (float)map.get("x");
-				rect.top = (float)map.get("y");
-				rect.right = (float)map.get("x")+(float)map.get("width");
-				rect.bottom = (float)map.get("y")+(float)map.get("height");
+				rect.set((float)map.get("x"),(float)map.get("y"),(float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
 				setItemSelectBox(rect);
 //				return Hit.FreeText;
 				return Hit.Annotation;
