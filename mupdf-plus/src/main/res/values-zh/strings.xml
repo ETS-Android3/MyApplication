@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="putkeyword">请输入查询关键字</string>
+	<string name="prechapter">上一章</string>
+	<string name="nextchapter">下一章</string>
 	<string name="appearance">外观</string>
 	<string name="booknote">笔记</string>
 	<string name="share">分享</string>
