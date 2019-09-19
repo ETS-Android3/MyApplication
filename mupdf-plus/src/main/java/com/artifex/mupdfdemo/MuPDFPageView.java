@@ -94,6 +94,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	private RectF mWidgetAreas[];
 	private Annotation mAnnotations[];
 	private int mSelectedAnnotationIndex = -1;
+	private int mSelectedFreetextIndex = -1;
 	private AsyncTask<Void,Void,RectF[]> mLoadWidgetAreas;
 	private AsyncTask<Void,Void,Annotation[]> mLoadAnnotations;
 	private AlertDialog.Builder mTextEntryBuilder;
@@ -113,7 +114,6 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	private AsyncTask<Void,Void,String> mCheckSignature;
 	private AsyncTask<Void,Void,Boolean> mSign;
 	private Runnable changeReporter;
-	public int mFreetextIndex;
 
 	public MuPDFPageView(Context c, FilePicker.FilePickerSupport filePickerSupport, MuPDFCore core, Point parentSize, MuPDFPageAdapter adapter) {
 		super(c, parentSize, adapter);
@@ -322,7 +322,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		boolean hit = false;
 		int i;
 		int t;
-		mFreetextIndex = -1;
+		mSelectedFreetextIndex = -1;
 
 		if (mAnnotations != null) {
 			for (i = 0; i < mAnnotations.length; i++)
@@ -413,7 +413,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 			PointF p = new PointF(docRelX, docRelY);
 
 			if (IsPointInMatrix(p1,p2,p3,p4,p)&&mPageNumber == (int)map.get("page")) {
-				mFreetextIndex = t;
+				mSelectedFreetextIndex = t;
 				RectF rect = new RectF();
 				rect.set((float)map.get("x"),(float)map.get("y"),(float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
 				setItemSelectBox(rect);
@@ -426,7 +426,7 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	}
 
 	public int getFreetextIndex(){
-		return mFreetextIndex;
+		return mSelectedFreetextIndex;
 	}
 
 	/**
@@ -532,7 +532,12 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	}
 
 	public void deleteSelectedAnnotation() {
-		if (mSelectedAnnotationIndex != -1) {
+		if(mSelectedFreetextIndex != -1){
+			MuPDFFreeTextData.mFreetext.remove(mSelectedFreetextIndex);
+			mSelectedFreetextIndex = -1;
+			setItemSelectBox(null);
+
+		}else if (mSelectedAnnotationIndex != -1) {
 			if (mDeleteAnnotation != null)
 				mDeleteAnnotation.cancel(true);
 

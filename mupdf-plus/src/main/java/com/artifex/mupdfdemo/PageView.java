@@ -650,6 +650,9 @@ public abstract class PageView extends ViewGroup {
         mItemSelectBox = rect;
         if (mSearchView != null)
             mSearchView.invalidate();
+
+        if (mCustomerView != null)
+            mCustomerView.invalidate();
     }
 
     public void addFreetextAnnotation(float x, float y, float width, float height, String text){
