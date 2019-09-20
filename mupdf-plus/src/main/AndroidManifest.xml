@@ -12,7 +12,9 @@
 
     <application
         android:hardwareAccelerated="true">
-
+        <activity android:name=".MuPDFActivity"></activity>
+        <activity android:name=".MuPDFActivity2"></activity>
+        <activity android:name=".OutlineActivity"></activity>
     </application>
 
 </manifest>

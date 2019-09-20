@@ -626,26 +626,26 @@ public abstract class PageView extends ViewGroup {
          * 显示菜单框
          * **/
         if(rect != null){
-            MuPDFActivity.mBookNotePop.setVisibility(View.VISIBLE);
+            MuPDFActivity2.mBookNotePop.setVisibility(View.VISIBLE);
             float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
             float docRelX = rect.left * scale + getLeft();
             float docRelY = rect.top * scale + getTop();
 
             if(docRelX<0){
-                MuPDFActivity.mBookNotePop.setX(0);
-            }else if(getWidth()/scale - docRelX <  MuPDFActivity.mBookNotePop.getMeasuredWidth()){
-                MuPDFActivity.mBookNotePop.setX(getWidth()/scale-MuPDFActivity.mBookNotePop.getMeasuredWidth());
+                MuPDFActivity2.mBookNotePop.setX(0);
+            }else if(getWidth()/scale - docRelX <  MuPDFActivity2.mBookNotePop.getMeasuredWidth()){
+                MuPDFActivity2.mBookNotePop.setX(getWidth()/scale-MuPDFActivity2.mBookNotePop.getMeasuredWidth());
             }else {
-                MuPDFActivity.mBookNotePop.setX(docRelX);
+                MuPDFActivity2.mBookNotePop.setX(docRelX);
             }
 
-            if(docRelY<MuPDFActivity.mBookNotePop.getMeasuredHeight()){
-                MuPDFActivity.mBookNotePop.setY((rect.bottom-rect.top) * scale+docRelY);
+            if(docRelY<MuPDFActivity2.mBookNotePop.getMeasuredHeight()){
+                MuPDFActivity2.mBookNotePop.setY((rect.bottom-rect.top) * scale+docRelY);
             }else {
-                MuPDFActivity.mBookNotePop.setY(docRelY-MuPDFActivity.mBookNotePop.getMeasuredHeight());
+                MuPDFActivity2.mBookNotePop.setY(docRelY-MuPDFActivity2.mBookNotePop.getMeasuredHeight());
             }
         }else {
-            MuPDFActivity.mBookNotePop.setVisibility(View.INVISIBLE);
+            MuPDFActivity2.mBookNotePop.setVisibility(View.INVISIBLE);
         }
         mItemSelectBox = rect;
         if (mSearchView != null)

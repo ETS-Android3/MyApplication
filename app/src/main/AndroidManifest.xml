@@ -11,15 +11,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-        <activity android:name="com.artifex.mupdfdemo.MuPDFActivity2">
+        <activity android:name="com.artifex.mupdfdemo.ChoosePDFActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.artifex.mupdfdemo.MuPDFActivity"></activity>
-        <activity android:name="com.artifex.mupdfdemo.OutlineActivity"></activity>
     </application>
 
 </manifest>

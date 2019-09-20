@@ -2,14 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" >
-        <include
-            layout="@layout/youkan_topbar" />
-    </RelativeLayout>
+    <include layout="@layout/youkan_topbar" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -27,12 +20,20 @@
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <include layout="@layout/youkan_buttons" />
+
+    <!--添加文本批注-->
+    <EditText
+        android:id="@+id/freeText"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" >
-        <include
-            layout="@layout/youkan_buttons" />
-    </RelativeLayout>
+        android:minWidth="80dp"
+        android:padding="0dp"
+        android:layout_margin="0dp"
+        android:background="@drawable/freetext" />
+
+    <!--批注弹出菜单-->
+    <include
+        android:id="@+id/booknotepop"
+        layout="@layout/booknotepop" />
 </RelativeLayout>
