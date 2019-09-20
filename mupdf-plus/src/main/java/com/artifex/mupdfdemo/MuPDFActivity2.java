@@ -34,6 +34,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -71,6 +72,8 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     private ImageButton  mLinkButton;
     private TopBarMode   mTopBarMode = TopBarMode.Main;
     private AcceptMode   mAcceptMode;
+    private LinearLayout  mAnnotationWrapper;
+    private RelativeLayout  mSearchWrapper;
     private ImageButton  mSearchBack;
     private ImageButton  mSearchFwd;
     private EditText     mSearchText;
@@ -390,7 +393,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         // First create the document view
         mDocView = new MuPDFReaderView(this) {
             /**
-             * 监听来自手势的切换页面动作
+             * 监听来自手势/search()的切换页面动作
              * **/
             @Override
             protected void onMoveToChild(int i) {
@@ -400,6 +403,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
                         core.countPages()));
                 mPageSlider.setMax((core.countPages() - 1) * mPageSliderRes);
                 mPageSlider.setProgress(i * mPageSliderRes);
+
                 super.onMoveToChild(i);
             }
 
@@ -408,13 +412,15 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
              * **/
             @Override
             protected void onTapMainDocArea() {
-                if (!mButtonsVisible) {
+                if(mSearchWrapper.getVisibility() == VISIBLE){
+                    searchModeOff();
+                }else if (!mButtonsVisible) {
                     showButtons();
                 } else {
-                    hideButtons();
-//                    if (mTopBarMode == TopBarMode.Main)
-//                        hideButtons();
+                    if (mTopBarMode == TopBarMode.Main)
+                        hideButtons();
                 }
+
             }
 
             /**
@@ -423,6 +429,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
             @Override
             protected void onDocMotion() {
                 hideButtons();
+                searchModeOff();
             }
 
             /**
@@ -889,10 +896,11 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     private void searchModeOn() {
         if (mTopBarMode != TopBarMode.Search) {
             mTopBarMode = TopBarMode.Search;
+            hideButtons();
+            mSearchWrapper.setVisibility(View.VISIBLE);
             //Focus on EditTextWidget
             mSearchText.requestFocus();
             showKeyboard();
-            mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
         }
     }
 
@@ -900,8 +908,8 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         if (mTopBarMode == TopBarMode.Search) {
             mTopBarMode = TopBarMode.Main;
             hideKeyboard();
-            mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
             SearchTaskResult.set(null);
+            mSearchWrapper.setVisibility(View.GONE);
             // Make the ReaderView act on the change to mSearchTaskResult
             // via overridden onChildSetup method.
             mDocView.resetupChildren();
@@ -966,9 +974,13 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
 //        mAnnotButton = (ImageButton)mButtonsView.findViewById(R.id.editAnnotButton);  //复制文本功能暂时取消
         mTopBarSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.topBarswitcher);//done
         mButtonsSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.buttonsSwitcher);//done
+
+        mAnnotationWrapper = (LinearLayout)mButtonsView.findViewById(R.id.annotationWrapper);
+        mSearchWrapper = (RelativeLayout)mButtonsView.findViewById(R.id.topBar1Search);
         mSearchBack = (ImageButton)mButtonsView.findViewById(R.id.searchBack);//extend
         mSearchFwd = (ImageButton)mButtonsView.findViewById(R.id.searchForward);//extend
         mSearchText = (EditText)mButtonsView.findViewById(R.id.searchText);//extend
+
 //        mLinkButton = (ImageButton)mButtonsView.findViewById(R.id.linkButton);  //功能暂时取消
         mTopBarSwitcher.setVisibility(View.INVISIBLE);
         mPageNumberView.setVisibility(View.INVISIBLE);
