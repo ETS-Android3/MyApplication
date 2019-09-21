@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.concurrent.Executor;
 
 import com.artifex.mupdfdemo.ReaderView.ViewMapper;
+import com.artifex.utils.DigitalizedEventCallback;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,6 +18,8 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,6 +43,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
+class ThreadPerTaskExecutor implements Executor {
+    public void execute(Runnable r) {
+        new Thread(r).start();
+    }
+}
+
 public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSupport
 {
     /* The core rendering instance */
@@ -56,7 +65,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     private boolean      mButtonsVisible;
     private EditText     mPasswordView;
     private EditText     mFreeTextView;
-    public static RelativeLayout mBookNotePop;
+    private RelativeLayout mBookNotePop;
     private TextView     mFilenameView;
     private SeekBar      mPageSlider;
     private int          mPageSliderRes;
@@ -72,7 +81,8 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     private ImageButton  mLinkButton;
     private TopBarMode   mTopBarMode = TopBarMode.Main;
     private AcceptMode   mAcceptMode;
-    private LinearLayout  mAnnotationWrapper;
+    private ViewAnimator  mAnnotationWrapper;
+    private ViewAnimator  mAnnotationConfirm;
     private RelativeLayout  mSearchWrapper;
     private ImageButton  mSearchBack;
     private ImageButton  mSearchFwd;
@@ -412,13 +422,17 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
              * **/
             @Override
             protected void onTapMainDocArea() {
-                if(mSearchWrapper.getVisibility() == VISIBLE){
+
+                if(mBookNotePop.getVisibility() == VISIBLE){
+                    hideBookNotePop();
+                }else if(mSearchWrapper.getVisibility() == VISIBLE) {
                     searchModeOff();
+                }else if(mAnnotationWrapper.getVisibility() == VISIBLE) {
+                    slideDownToHide(mAnnotationWrapper);
                 }else if (!mButtonsVisible) {
                     showButtons();
-                } else {
-                    if (mTopBarMode == TopBarMode.Main)
-                        hideButtons();
+                }else if(mButtonsVisible){
+                    hideButtons();
                 }
 
             }
@@ -428,8 +442,9 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
              * **/
             @Override
             protected void onDocMotion() {
-                hideButtons();
                 searchModeOff();
+                hideBookNotePop();
+                hideButtons();
             }
 
             /**
@@ -438,6 +453,10 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
             @Override
             protected void onHit(Hit item) {
 //                switch (mTopBarMode) {
+//                    case Search:
+//                        if(item != Hit.Nothing){
+//                            searchModeOff();
+//                        }
 //                    case Annot:
 //                        if (item == Hit.Annotation) {
 //                            showButtons();
@@ -542,6 +561,63 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
          * **/
         mDocView.setAdapter(new MuPDFPageAdapter(this, this, core));
 
+        mDocView.setEventCallback(new DigitalizedEventCallback(){
+            @Override
+            public void longPressOnPdfPosition(int page, float viewX, float viewY, float pdfX, float pdfY){
+
+            }
+
+            @Override
+            public void doubleTapOnPdfPosition(int page, float viewX, float viewY, float pdfX, float pdfY){
+
+            }
+
+            @Override
+            public void singleTapOnPdfPosition(int page, float viewX, float viewY, float pdfX, float pdfY){
+            }
+
+            @Override
+            public void singleTapOnPdfAnnotation(RectF rect, float scale){
+              MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+              if(rect != null) {
+                  float docRelX = rect.left * scale + pageView.getLeft();
+                  float docRelY = rect.top * scale + pageView.getTop();
+                  mBookNotePop.setVisibility(View.VISIBLE);
+                  mTopBarMode = TopBarMode.Annot;
+
+                  if(docRelX<0){
+                      mBookNotePop.setX(0);
+                  }else if(mDocView.getWidth()/scale - docRelX <  mBookNotePop.getMeasuredWidth()){
+                      mBookNotePop.setX(mDocView.getWidth()/scale-mBookNotePop.getMeasuredWidth());
+                  }else {
+                      mBookNotePop.setX(docRelX);
+                  }
+
+                  if(docRelY<mBookNotePop.getMeasuredHeight()){
+                      mBookNotePop.setY((rect.bottom-rect.top) * scale+docRelY);
+                  }else {
+                      mBookNotePop.setY(docRelY-mBookNotePop.getMeasuredHeight());
+                  }
+              }
+            }
+
+            @Override
+            public void touchMoceOnPdfAnnotation(){
+
+            }
+
+            @Override
+            public void pageChanged(int page){
+
+            }
+
+            @Override
+            public void error(String message){
+
+            }
+            }
+        );
+
         /**
          * 搜索任务
          * **/
@@ -588,27 +664,6 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
                 searchModeOn();
             }
         });
-
-        // Activate the reflow button
-//        mReflowButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                toggleReflow();
-//            }
-//        });
-
-//        if (core.fileFormat().startsWith("PDF") && core.isUnencryptedPDF() && !core.wasOpenedFromBuffer())
-//        {
-//            mAnnotButton.setOnClickListener(new View.OnClickListener() {
-//                public void onClick(View v) {
-//                    mTopBarMode = TopBarMode.Annot;
-//                    mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
-//                }
-//            });
-//        }
-//        else
-//        {
-//            mAnnotButton.setVisibility(View.GONE);
-//        }
 
         // Search invoking buttons are disabled while there is no text specified
         mSearchBack.setEnabled(false);
@@ -837,29 +892,10 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
                 mSearchText.requestFocus();
                 showKeyboard();
             }
+
             mPageNumberView.setVisibility(View.VISIBLE);
-
-            Animation anim = new TranslateAnimation(0, 0, -mTopBarSwitcher.getHeight(), 0);
-            anim.setDuration(200);
-            anim.setAnimationListener(new Animation.AnimationListener() {
-                public void onAnimationStart(Animation animation) {
-                    mTopBarSwitcher.setVisibility(View.VISIBLE);
-                }
-                public void onAnimationRepeat(Animation animation) {}
-                public void onAnimationEnd(Animation animation) {}
-            });
-            mTopBarSwitcher.startAnimation(anim);
-
-            anim = new TranslateAnimation(0, 0, mButtonsSwitcher.getHeight(), 0);
-            anim.setDuration(200);
-            anim.setAnimationListener(new Animation.AnimationListener() {
-                public void onAnimationStart(Animation animation) {
-                    mButtonsSwitcher.setVisibility(View.VISIBLE);
-                }
-                public void onAnimationRepeat(Animation animation) {}
-                public void onAnimationEnd(Animation animation) { }
-            });
-            mButtonsSwitcher.startAnimation(anim);
+            slideDownToVisible(mTopBarSwitcher);
+            slideUpToVisible(mButtonsSwitcher);
         }
     }
 
@@ -867,29 +903,16 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         if (mButtonsVisible) {
             mButtonsVisible = false;
             hideKeyboard();
+
             mPageNumberView.setVisibility(View.INVISIBLE);
+            slideUpToHide(mTopBarSwitcher);
+            slideDownToHide(mButtonsSwitcher);
+        }
+    }
 
-            Animation anim = new TranslateAnimation(0, 0, 0, -mTopBarSwitcher.getHeight());
-            anim.setDuration(200);
-            anim.setAnimationListener(new Animation.AnimationListener() {
-                public void onAnimationStart(Animation animation) {}
-                public void onAnimationRepeat(Animation animation) {}
-                public void onAnimationEnd(Animation animation) {
-                    mTopBarSwitcher.setVisibility(View.INVISIBLE);
-                }
-            });
-            mTopBarSwitcher.startAnimation(anim);
-
-            anim = new TranslateAnimation(0, 0, 0, mButtonsSwitcher.getHeight());
-            anim.setDuration(200);
-            anim.setAnimationListener(new Animation.AnimationListener() {
-                public void onAnimationStart(Animation animation) { }
-                public void onAnimationRepeat(Animation animation) {}
-                public void onAnimationEnd(Animation animation) {
-                    mButtonsSwitcher.setVisibility(View.INVISIBLE);
-                }
-            });
-            mButtonsSwitcher.startAnimation(anim);
+    private void hideBookNotePop(){
+        if(mBookNotePop.getVisibility() == View.VISIBLE){
+            mBookNotePop.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -922,6 +945,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         mPageNumberView.setText(String.format("%d / %d", index+1, core.countPages()));
     }
 
+    //云打印pdf
     private void printDoc() {
         if (!core.fileFormat().startsWith("PDF")) {
             showInfo(getString(R.string.format_currently_not_supported));
@@ -945,19 +969,19 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     }
 
     private void showInfo(String message) {
-//        mInfoView.setText(message);
-//
-//        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
-//        if (currentApiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-//            SafeAnimatorInflater safe = new SafeAnimatorInflater((Activity)this, R.animator.info, (View)mInfoView);
-//        } else {
-//            mInfoView.setVisibility(View.VISIBLE);
-//            mHandler.postDelayed(new Runnable() {
-//                public void run() {
-//                    mInfoView.setVisibility(View.INVISIBLE);
-//                }
-//            }, 500);
-//        }
+        mInfoView.setText(message);
+
+        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
+        if (currentApiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            SafeAnimatorInflater safe = new SafeAnimatorInflater((Activity)this, R.animator.info, (View)mInfoView);
+        } else {
+            mInfoView.setVisibility(View.VISIBLE);
+            mHandler.postDelayed(new Runnable() {
+                public void run() {
+                    mInfoView.setVisibility(View.INVISIBLE);
+                }
+            }, 500);
+        }
     }
 
     private void makeButtonsView() {
@@ -967,7 +991,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         mBookNotePop = (RelativeLayout)mButtonsView.findViewById(R.id.booknotepop);//done
         mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);//done
         mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);//done
-//        mInfoView = (TextView)mButtonsView.findViewById(R.id.info);   //显示当前操作功能暂时取消
+        mInfoView = (TextView)mButtonsView.findViewById(R.id.info);
         mSearchButton = (ImageButton)mButtonsView.findViewById(R.id.searchButton);//extend
 //        mReflowButton = (ImageButton)mButtonsView.findViewById(R.id.reflowButton);    //功能暂时取消
         mOutlineButton = (ImageButton)mButtonsView.findViewById(R.id.outlineButton);//done
@@ -975,7 +999,8 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         mTopBarSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.topBarswitcher);//done
         mButtonsSwitcher = (ViewAnimator)mButtonsView.findViewById(R.id.buttonsSwitcher);//done
 
-        mAnnotationWrapper = (LinearLayout)mButtonsView.findViewById(R.id.annotationWrapper);
+        mAnnotationWrapper = (ViewAnimator)mButtonsView.findViewById(R.id.annotationWrapper);
+        mAnnotationConfirm = (ViewAnimator)mButtonsView.findViewById(R.id.annotationConfirm);
         mSearchWrapper = (RelativeLayout)mButtonsView.findViewById(R.id.topBar1Search);
         mSearchBack = (ImageButton)mButtonsView.findViewById(R.id.searchBack);//extend
         mSearchFwd = (ImageButton)mButtonsView.findViewById(R.id.searchForward);//extend
@@ -984,21 +1009,12 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
 //        mLinkButton = (ImageButton)mButtonsView.findViewById(R.id.linkButton);  //功能暂时取消
         mTopBarSwitcher.setVisibility(View.INVISIBLE);
         mPageNumberView.setVisibility(View.INVISIBLE);
-//        mInfoView.setVisibility(View.INVISIBLE);
+        mInfoView.setVisibility(View.INVISIBLE);
         mFreeTextView.setVisibility(View.INVISIBLE);
         mFreeTextView.measure(0,0);
         mBookNotePop.setVisibility(View.INVISIBLE);
     }
 
-    public void OnMoreButtonClick(View v) {
-        mTopBarMode = TopBarMode.More;
-        mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
-    }
-
-    public void OnCancelMoreButtonClick(View v) {
-        mTopBarMode = TopBarMode.Main;
-        mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
-    }
 
     public void OnPrintButtonClick(View v) {
         printDoc();
@@ -1046,103 +1062,18 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         showInfo(getString(R.string.select_text));
     }
 
-    public void OnInkButtonClick(View v) {
-        mTopBarMode = TopBarMode.Accept;
-        mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
-        mAcceptMode = AcceptMode.Ink;
-        mDocView.setMode(MuPDFReaderView.Mode.Drawing);
-        showInfo(getString(R.string.draw_annotation));
-    }
-
-    public void OnCancelAcceptButtonClick(View v) {
-        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-        if (pageView != null) {
-            pageView.deselectText();
-            pageView.cancelDraw();
-        }
-        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
-        switch (mAcceptMode) {
-            case CopyText:
-                mTopBarMode = TopBarMode.More;
-                break;
-            default:
-                mTopBarMode = TopBarMode.Annot;
-                break;
-        }
-        mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
-    }
-
-    public void OnAcceptButtonClick(View v) {
-        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-        boolean success = false;
-        switch (mAcceptMode) {
-            case CopyText:
-                if (pageView != null)
-                    success = pageView.copySelection();
-                mTopBarMode = TopBarMode.More;
-                showInfo(success?getString(R.string.copied_to_clipboard):getString(R.string.no_text_selected));
-                break;
-
-            case Highlight:
-                if (pageView != null)
-                    success = pageView.markupSelection(Annotation.Type.HIGHLIGHT);
-                mTopBarMode = TopBarMode.Annot;
-                if (!success)
-                    showInfo(getString(R.string.no_text_selected));
-                break;
-
-            case Underline:
-                if (pageView != null)
-                    success = pageView.markupSelection(Annotation.Type.UNDERLINE);
-                mTopBarMode = TopBarMode.Annot;
-                if (!success)
-                    showInfo(getString(R.string.no_text_selected));
-                break;
-
-            case StrikeOut:
-                if (pageView != null)
-                    success = pageView.markupSelection(Annotation.Type.STRIKEOUT);
-                mTopBarMode = TopBarMode.Annot;
-                if (!success)
-                    showInfo(getString(R.string.no_text_selected));
-                break;
-
-            case Ink:
-                if (pageView != null)
-                    success = pageView.saveDraw();
-                mTopBarMode = TopBarMode.Annot;
-                if (!success)
-                    showInfo(getString(R.string.nothing_to_save));
-                break;
-        }
-        mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
-        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
-    }
 
     public void OnCancelSearchButtonClick(View v) {
         searchModeOff();
     }
 
+    //删除当前所选的批注/文本/下划线/高亮/删除线
     public void OnDeleteButtonClick(View v) {
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         if (pageView != null)
             pageView.deleteSelectedAnnotation();
         mTopBarMode = TopBarMode.Annot;
         mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
-    }
-
-    public void OnCancelDeleteButtonClick(View v) {
-        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-        if (pageView != null)
-            pageView.deselectAnnotation();
-        mTopBarMode = TopBarMode.Annot;
-        mTopBarSwitcher.setDisplayedChild(mTopBarMode.ordinal());
-    }
-
-    //文本批注按钮
-    public void OnFreeTextButtonClick(View v){
-        showInfo("添加文本批注");
-        mDocView.setMode(MuPDFReaderView.Mode.Freetexting);
     }
 
     private void showKeyboard() {
@@ -1239,14 +1170,116 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         startActivityForResult(intent, FILEPICK_REQUEST);
     }
 
+
+
+
+    /************ Animate Tools ************/
+    //向上滑动以显示
+    public void slideUpToVisible(final ViewAnimator v){
+        Animation anim = new TranslateAnimation(0,0, v.getHeight(),0);
+        anim.setDuration(200);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationStart(Animation animation) {
+                v.setVisibility(View.VISIBLE);
+            }
+            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationEnd(Animation animation) {}
+        });
+        v.startAnimation(anim);
+    }
+    //向上滑动以隐藏
+    public void slideUpToHide(final ViewAnimator v){
+        Animation anim = new TranslateAnimation(0,0,0, -v.getHeight());
+        anim.setDuration(200);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationStart(Animation animation) {}
+            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationEnd(Animation animation) {
+                v.setVisibility(View.INVISIBLE);
+            }
+        });
+        v.startAnimation(anim);
+    }
+    //向下滑动以显示
+    public void slideDownToVisible(final ViewAnimator v){
+        Animation anim = new TranslateAnimation(0,0, -v.getHeight(),0);
+        anim.setDuration(200);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationStart(Animation animation) {
+                v.setVisibility(View.VISIBLE);
+            }
+            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationEnd(Animation animation) {}
+        });
+        v.startAnimation(anim);
+    }
+    //向下滑动以隐藏
+    public void slideDownToHide(final ViewAnimator v){
+        Animation anim = new TranslateAnimation(0,0,0, v.getHeight());
+        anim.setDuration(200);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationStart(Animation animation) {}
+            public void onAnimationRepeat(Animation animation) {}
+            public void onAnimationEnd(Animation animation) {
+                v.setVisibility(View.INVISIBLE);
+            }
+        });
+        v.startAnimation(anim);
+    }
+
+    /************ DOM Click Event ************/
+    //上一页
     public void onSmartMoveBackwards(View v){
         mDocView.smartMoveBackwards();
     }
-
+    //下一页
     public void onSmartMoveForwards(View v){
         mDocView.smartMoveForwards();
     }
 
+    //显示多功能批注菜单
+    public void onShowAnnotationWrapper(View v){
+        hideButtons();
+        slideUpToVisible(mAnnotationWrapper);
+    }
+    //墨迹
+    public void onAnnotationDrawer(View v){
+        mDocView.setMode(MuPDFReaderView.Mode.Drawing);
+        showInfo(getString(R.string.draw_annotation));
+        slideDownToHide(mAnnotationWrapper);
+        slideUpToVisible(mAnnotationConfirm);
+    }
+    //文本
+    public void onAnnotationFreetext(View v){
+        slideDownToHide(mAnnotationWrapper);
+        showInfo("添加文本批注");
+        mDocView.setMode(MuPDFReaderView.Mode.Freetexting);
+    }
+
+    //保存当前墨迹
+    public void onAnnotationSave(View v){
+        slideDownToHide(mAnnotationConfirm);
+
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        if (pageView != null) {
+            if (!pageView.saveDraw())
+                showInfo(getString(R.string.nothing_to_save));
+        }
+        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+    }
+    //取消当前墨迹
+    public void onAnnotationCancel(View v){
+        slideDownToHide(mAnnotationConfirm);
+
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        if (pageView != null) {
+            pageView.deselectText();
+            pageView.cancelDraw();
+        }
+        mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+    }
+
+    //上下bar添加点击事件可防止canvas onPassClick事件冒泡
     public void onBubbling(View v){
 
     }

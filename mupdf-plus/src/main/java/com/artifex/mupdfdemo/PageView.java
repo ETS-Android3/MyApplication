@@ -625,28 +625,11 @@ public abstract class PageView extends ViewGroup {
         /**
          * 显示菜单框
          * **/
-        if(rect != null){
-            MuPDFActivity2.mBookNotePop.setVisibility(View.VISIBLE);
+        if (eventCallback != null) {
             float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
-            float docRelX = rect.left * scale + getLeft();
-            float docRelY = rect.top * scale + getTop();
-
-            if(docRelX<0){
-                MuPDFActivity2.mBookNotePop.setX(0);
-            }else if(getWidth()/scale - docRelX <  MuPDFActivity2.mBookNotePop.getMeasuredWidth()){
-                MuPDFActivity2.mBookNotePop.setX(getWidth()/scale-MuPDFActivity2.mBookNotePop.getMeasuredWidth());
-            }else {
-                MuPDFActivity2.mBookNotePop.setX(docRelX);
-            }
-
-            if(docRelY<MuPDFActivity2.mBookNotePop.getMeasuredHeight()){
-                MuPDFActivity2.mBookNotePop.setY((rect.bottom-rect.top) * scale+docRelY);
-            }else {
-                MuPDFActivity2.mBookNotePop.setY(docRelY-MuPDFActivity2.mBookNotePop.getMeasuredHeight());
-            }
-        }else {
-            MuPDFActivity2.mBookNotePop.setVisibility(View.INVISIBLE);
+            eventCallback.singleTapOnPdfAnnotation(rect,scale);
         }
+
         mItemSelectBox = rect;
         if (mSearchView != null)
             mSearchView.invalidate();

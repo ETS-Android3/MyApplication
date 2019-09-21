@@ -322,8 +322,28 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 		boolean hit = false;
 		int i;
 		int t;
-		mSelectedFreetextIndex = -1;
 
+		//自定义文本批注
+		mSelectedFreetextIndex = -1;
+		for (t=0;t < MuPDFFreeTextData.mFreetext.size(); t++) {
+			HashMap map = MuPDFFreeTextData.mFreetext.get(t);
+			PointF p1 = new PointF((float)map.get("x"),(float)map.get("y"));
+			PointF p2 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y"));
+			PointF p3 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
+			PointF p4 = new PointF((float)map.get("x"),(float)map.get("y")+(float)map.get("height"));
+
+			PointF p = new PointF(docRelX, docRelY);
+
+			if (IsPointInMatrix(p1,p2,p3,p4,p)&&mPageNumber == (int)map.get("page")) {
+				mSelectedFreetextIndex = t;
+				RectF rect = new RectF();
+				rect.set((float)map.get("x"),(float)map.get("y"),(float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
+				setItemSelectBox(rect);
+				return Hit.FreeText;
+			}
+		}
+
+		//原生批注
 		if (mAnnotations != null) {
 			for (i = 0; i < mAnnotations.length; i++)
 				if (mAnnotations[i].contains(docRelX, docRelY)) {
@@ -401,25 +421,6 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 
 			mPassClick.execute();
 			return Hit.Widget;
-		}
-
-		for (t=0;t < MuPDFFreeTextData.mFreetext.size(); t++) {
-			HashMap map = MuPDFFreeTextData.mFreetext.get(t);
-			PointF p1 = new PointF((float)map.get("x"),(float)map.get("y"));
-			PointF p2 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y"));
-			PointF p3 = new PointF((float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
-			PointF p4 = new PointF((float)map.get("x"),(float)map.get("y")+(float)map.get("height"));
-
-			PointF p = new PointF(docRelX, docRelY);
-
-			if (IsPointInMatrix(p1,p2,p3,p4,p)&&mPageNumber == (int)map.get("page")) {
-				mSelectedFreetextIndex = t;
-				RectF rect = new RectF();
-				rect.set((float)map.get("x"),(float)map.get("y"),(float)map.get("x")+(float)map.get("width"),(float)map.get("y")+(float)map.get("height"));
-				setItemSelectBox(rect);
-//				return Hit.FreeText;
-				return Hit.Annotation;
-			}
 		}
 
 		return Hit.Nothing;

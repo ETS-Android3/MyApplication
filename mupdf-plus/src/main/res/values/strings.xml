@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="issignature">Whether to generate the signature content</string>
 	<string name="putkeyword">Keyword</string>
 	<string name="prechapter">Last</string>
 	<string name="nextchapter">Next</string>

@@ -106,6 +106,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="18dp"
                         android:layout_marginTop="11dp"
+                        android:onClick="onShowAnnotationWrapper"
                         android:src="@mipmap/drawing"/>
                 </LinearLayout>
 
@@ -142,45 +143,52 @@
         </LinearLayout>
 
     </ViewAnimator>
-
-    <LinearLayout
+    <ViewAnimator
         android:id="@+id/annotationWrapper"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
         android:layout_alignParentBottom="true"
-        android:background="#EE000000"
-        android:orientation="horizontal"
+        android:onClick="onBubbling"
         android:visibility="gone">
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <ImageButton
-                android:background="@drawable/button"
+            android:gravity="bottom"
+            android:background="#EE000000"
+            android:orientation="horizontal"
+            >
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="18dp"
-                android:layout_marginTop="11dp"
-                android:src="@mipmap/pencil" />
-        </LinearLayout>
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+                <ImageButton
+                    android:background="@drawable/button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:layout_marginTop="11dp"
+                    android:onClick="onAnnotationDrawer"
+                    android:src="@mipmap/pencil" />
+            </LinearLayout>
 
-            <ImageButton
-                android:background="@drawable/button"
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="18dp"
-                android:layout_marginTop="11dp"
-                android:src="@mipmap/writetext"/>
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:background="@drawable/button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:layout_marginTop="11dp"
+                    android:onClick="onAnnotationFreetext"
+                    android:src="@mipmap/writetext"/>
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </ViewAnimator>
 
 </RelativeLayout>

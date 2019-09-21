@@ -21,6 +21,7 @@
     </RelativeLayout>
 
     <include layout="@layout/youkan_buttons" />
+    <include layout="@layout/youkan_confirm" />
 
     <!--添加文本批注-->
     <EditText
@@ -36,4 +37,14 @@
     <include
         android:id="@+id/booknotepop"
         layout="@layout/booknotepop" />
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/page_num"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#FFFFFF" />
 </RelativeLayout>

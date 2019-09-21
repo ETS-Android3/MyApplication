@@ -108,9 +108,9 @@ public class MuPDFReaderView extends ReaderView {
 				} else {
 					onTapMainDocArea();
 				}
-			}else if(item == Hit.FreeText) {
-				onFreetextClick(pageView.getFreetextIndex());
-				setMode(Mode.Freetexting);
+//			}else if(item == Hit.FreeText) {
+//				onFreetextClick(pageView.getFreetextIndex());
+//				setMode(Mode.Freetexting);
             }
 		}else if (mMode == Mode.Freetexting){
 			onFreetextAdd(e.getX(), e.getY());

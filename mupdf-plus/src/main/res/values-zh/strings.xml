@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="issignature">是否生成签名内容</string>
 	<string name="putkeyword">请输入查询关键字</string>
 	<string name="prechapter">上一章</string>
 	<string name="nextchapter">下一章</string>
@@ -22,7 +23,7 @@
 	<string name="delete">删除</string>
 	<string name="dismiss">解除</string>
 	<string name="document_has_changes_save_them_">文档已变更，保存变更吗？</string>
-	<string name="draw_annotation">作批注</string>
+	<string name="draw_annotation">开始绘制批注</string>
 	<string name="edit_annotations">编辑批注</string>
 	<string name="enter_password">输入密码</string>
 	<string name="entering_reflow_mode">输入重排模式</string>
