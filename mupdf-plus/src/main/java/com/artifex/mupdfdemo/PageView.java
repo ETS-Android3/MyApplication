@@ -928,7 +928,7 @@ public abstract class PageView extends ViewGroup {
 
             float[] coords = translateCoords(mScale, x, y);
             if (coords != null) {
-                eventCallback.longPressOnPdfPosition(mPageNumber, coords[0], coords[1], coords[2], coords[3]);
+                eventCallback.longPressOnPdfPosition(mPageNumber, x, y, coords[2], coords[3]);
             }
         }
     }

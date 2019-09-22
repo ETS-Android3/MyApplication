@@ -17,6 +17,7 @@ public class MuPDFReaderView extends ReaderView {
 	private boolean mLinksEnabled = false;
 	private Mode mMode = Mode.Viewing;
 	private boolean tapDisabled = false;
+	private boolean isLongPressed = false;//Continue onScroll event after onLongPress
 	private int tapPageMargin;
     
     private final boolean TAP_PAGING_ENABLED = false;
@@ -112,8 +113,12 @@ public class MuPDFReaderView extends ReaderView {
 //				onFreetextClick(pageView.getFreetextIndex());
 //				setMode(Mode.Freetexting);
             }
-		}else if (mMode == Mode.Freetexting){
+		}else if (mMode == Mode.Freetexting) {
 			onFreetextAdd(e.getX(), e.getY());
+		}else if (mMode == Mode.Selecting) {
+            mMode = Mode.Viewing;
+            MuPDFView pageView = (MuPDFView) getDisplayedView();
+            pageView.deselectText();
 		}
 		return super.onSingleTapUp(e);
 	}
@@ -171,6 +176,11 @@ public class MuPDFReaderView extends ReaderView {
 
 	}
 
+	public void onLongPress(MotionEvent event) {
+		isLongPressed = true;
+		super.onLongPress(event);
+	}
+
 	public boolean onTouchEvent(MotionEvent event) {
 
 		if ( mMode == Mode.Drawing )
@@ -190,6 +200,19 @@ public class MuPDFReaderView extends ReaderView {
 					break;
 			}
 		}
+
+		if ( mMode == Mode.Selecting && isLongPressed )
+		{
+			switch (event.getActionMasked()) {
+				case MotionEvent.ACTION_MOVE:
+					MotionEvent cancel = MotionEvent.obtain(event);
+					cancel.setAction(MotionEvent.ACTION_CANCEL);
+					mGestureDetector.onTouchEvent(cancel);
+					isLongPressed = false;
+					break;
+			}
+		}
+
 
 		if ((event.getAction() & event.getActionMasked()) == MotionEvent.ACTION_DOWN)
 		{
