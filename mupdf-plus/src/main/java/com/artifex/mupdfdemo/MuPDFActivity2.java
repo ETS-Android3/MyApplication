@@ -67,6 +67,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     private EditText     mPasswordView;
     private EditText     mFreeTextView;
     private RelativeLayout mBookNotePop;
+    private RelativeLayout bookselecttextpop;
     private TextView     mFilenameView;
     private SeekBar      mPageSlider;
     private int          mPageSliderRes;
@@ -573,26 +574,45 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
               if(rect != null) {
                   float docRelX = rect.left * scale + pageView.getLeft();
                   float docRelY = rect.top * scale + pageView.getTop();
-                  mBookNotePop.setVisibility(View.VISIBLE);
 
-                  if(docRelX<0){
-                      mBookNotePop.setX(0);
-                  }else if(mDocView.getWidth() - docRelX <  mBookNotePop.getMeasuredWidth()){
-                      mBookNotePop.setX(mDocView.getWidth()-mBookNotePop.getMeasuredWidth());
-                  }else {
-                      mBookNotePop.setX(docRelX);
-                  }
+                  if(mDocView.mMode == MuPDFReaderView.Mode.Selecting){
+                      bookselecttextpop.setVisibility(View.VISIBLE);
 
-                  if(docRelY<mBookNotePop.getMeasuredHeight()){
-                      mBookNotePop.setY((rect.bottom-rect.top) * scale+docRelY);
+                      if(docRelX<0){
+                          bookselecttextpop.setX(0);
+                      }else if(mDocView.getWidth() - docRelX <  bookselecttextpop.getMeasuredWidth()){
+                          bookselecttextpop.setX(mDocView.getWidth()-bookselecttextpop.getMeasuredWidth());
+                      }else {
+                          bookselecttextpop.setX(docRelX);
+                      }
+
+                      if(docRelY<bookselecttextpop.getMeasuredHeight()){
+                          bookselecttextpop.setY((rect.bottom-rect.top) * scale+docRelY);
+                      }else {
+                          bookselecttextpop.setY(docRelY-bookselecttextpop.getMeasuredHeight());
+                      }
                   }else {
-                      mBookNotePop.setY(docRelY-mBookNotePop.getMeasuredHeight());
+                      mBookNotePop.setVisibility(View.VISIBLE);
+
+                      if(docRelX<0){
+                          mBookNotePop.setX(0);
+                      }else if(mDocView.getWidth() - docRelX <  mBookNotePop.getMeasuredWidth()){
+                          mBookNotePop.setX(mDocView.getWidth()-mBookNotePop.getMeasuredWidth());
+                      }else {
+                          mBookNotePop.setX(docRelX);
+                      }
+
+                      if(docRelY<mBookNotePop.getMeasuredHeight()){
+                          mBookNotePop.setY((rect.bottom-rect.top) * scale+docRelY);
+                      }else {
+                          mBookNotePop.setY(docRelY-mBookNotePop.getMeasuredHeight());
+                      }
                   }
               }
             }
 
             @Override
-            public void touchMoceOnPdfAnnotation(){
+            public void touchMoveOnPdfAnnotation(){
 
             }
 
@@ -973,6 +993,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         mFilenameView = (TextView)mButtonsView.findViewById(R.id.docNameText);//done
         mFreeTextView = (EditText)mButtonsView.findViewById(R.id.freeText);//done
         mBookNotePop = (RelativeLayout)mButtonsView.findViewById(R.id.booknotepop);//done
+        bookselecttextpop = (RelativeLayout)mButtonsView.findViewById(R.id.bookselecttextpop);//done
         mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);//done
         mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);//done
         mInfoView = (TextView)mButtonsView.findViewById(R.id.info);
@@ -998,6 +1019,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         mFreeTextView.setVisibility(View.INVISIBLE);
         mFreeTextView.measure(0,0);
         mBookNotePop.setVisibility(View.INVISIBLE);
+        bookselecttextpop.setVisibility(View.INVISIBLE);
     }
 
 

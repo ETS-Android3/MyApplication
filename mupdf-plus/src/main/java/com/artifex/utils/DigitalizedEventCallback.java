@@ -16,5 +16,5 @@ public interface DigitalizedEventCallback {
     public void pageChanged(int page);
     public void error(String message);
     public void singleTapOnPdfAnnotation(RectF rect, float scale);
-    public void touchMoceOnPdfAnnotation();
+    public void touchMoveOnPdfAnnotation();
 }

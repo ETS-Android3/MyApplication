@@ -15,7 +15,7 @@ public class MuPDFReaderView extends ReaderView {
 	enum Mode {Viewing, Selecting, Drawing, Freetexting}
 	private final Context mContext;
 	private boolean mLinksEnabled = false;
-	private Mode mMode = Mode.Viewing;
+	public Mode mMode = Mode.Viewing;
 	private boolean tapDisabled = false;
 	private boolean isLongPressed = false;//Continue onScroll event after onLongPress
 	private int tapPageMargin;

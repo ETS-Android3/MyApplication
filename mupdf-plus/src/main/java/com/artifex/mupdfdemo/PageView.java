@@ -146,7 +146,7 @@ public abstract class PageView extends ViewGroup {
     private static boolean flagPositions = true; // Concurrency flag to avoid entering twice onDoubleTap method.
     private Bitmap signBitmap; // Bitmap for signature at higher resolution. // *BACKWARD COMPATIBILITY*
     private Point signBitmapSize; // Bitmap size, scaled to screen size and pdf.
-    private static DigitalizedEventCallback eventCallback; // Callback for the app. The library fires an event when the user touched longPress or doubleTap, and the app can manage the behaviour.
+    protected static DigitalizedEventCallback eventCallback; // Callback for the app. The library fires an event when the user touched longPress or doubleTap, and the app can manage the behaviour.
 
     private Paint mBitmapPaint;
     private MuPDFPageAdapter mAdapter;
@@ -335,6 +335,7 @@ public abstract class PageView extends ViewGroup {
                     // from source to view
                     final float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
                     final Paint paint = new Paint();
+                    final RectF mSelectFirstRect = new RectF();  //选择文本时的第一个字节节点
 
                     if (!mIsBlank && mSearchBoxes != null) {
                         paint.setColor(HIGHLIGHT_COLOR);
@@ -362,12 +363,17 @@ public abstract class PageView extends ViewGroup {
                             }
 
                             public void onWord(TextWord word) {
+                                if(mSelectFirstRect.left == 0 && mSelectFirstRect.right == 0 && mSelectFirstRect.top == 0 && mSelectFirstRect.bottom == 0){
+                                    mSelectFirstRect.union(word);
+                                }
                                 rect.union(word);
                             }
 
                             public void onEndLine() {
                                 if (!rect.isEmpty())
                                     canvas.drawRect(rect.left * scale, rect.top * scale, rect.right * scale, rect.bottom * scale, paint);
+                                    if (eventCallback != null)
+                                        eventCallback.singleTapOnPdfAnnotation(new RectF(mSelectFirstRect.left,mSelectFirstRect.top,mSelectBox.right,mSelectBox.bottom),scale);
                             }
                         });
                     }
@@ -420,6 +426,7 @@ public abstract class PageView extends ViewGroup {
                         canvas.drawPath(path, paint);
                     }
                 }
+
             };
 
             addView(mSearchView);
@@ -617,7 +624,8 @@ public abstract class PageView extends ViewGroup {
         return path;
     }
 
-    protected void processSelectedText(TextProcessor tp) {
+    public void processSelectedText(TextProcessor tp) {
+        System.out.println("LUOKUN: "+mText+"; "+mSelectBox);
         (new TextSelector(mText, mSelectBox)).select(tp);
     }
 

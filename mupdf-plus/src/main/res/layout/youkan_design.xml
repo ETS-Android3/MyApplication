@@ -38,6 +38,10 @@
         android:id="@+id/booknotepop"
         layout="@layout/booknotepop" />
 
+    <include
+        android:id="@+id/bookselecttextpop"
+        layout="@layout/bookselecttextpop" />
+
     <TextView
         android:id="@+id/info"
         android:layout_width="wrap_content"
