@@ -429,6 +429,9 @@ public class MuPDFPageView extends PageView implements MuPDFView {
 	public int getFreetextIndex(){
 		return mSelectedFreetextIndex;
 	}
+	public int getSelectedAnnotationIndex(){
+		return mSelectedAnnotationIndex;
+	}
 
 	/**
 	 * 判断点是否在一个矩形内

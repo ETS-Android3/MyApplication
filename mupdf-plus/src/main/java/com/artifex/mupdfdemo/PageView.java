@@ -373,7 +373,7 @@ public abstract class PageView extends ViewGroup {
                                 if (!rect.isEmpty())
                                     canvas.drawRect(rect.left * scale, rect.top * scale, rect.right * scale, rect.bottom * scale, paint);
                                     if (eventCallback != null)
-                                        eventCallback.singleTapOnPdfAnnotation(new RectF(mSelectFirstRect.left,mSelectFirstRect.top,mSelectBox.right,mSelectBox.bottom),scale);
+                                        eventCallback.touchDown(new RectF(mSelectFirstRect.left,mSelectFirstRect.top,rect.right,rect.bottom),scale);
                             }
                         });
                     }
@@ -625,7 +625,6 @@ public abstract class PageView extends ViewGroup {
     }
 
     public void processSelectedText(TextProcessor tp) {
-        System.out.println("LUOKUN: "+mText+"; "+mSelectBox);
         (new TextSelector(mText, mSelectBox)).select(tp);
     }
 
@@ -635,7 +634,7 @@ public abstract class PageView extends ViewGroup {
          * **/
         if (eventCallback != null) {
             float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
-            eventCallback.singleTapOnPdfAnnotation(rect,scale);
+            eventCallback.touchDown(rect,scale);
         }
 
         mItemSelectBox = rect;

@@ -30,6 +30,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -41,6 +42,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
@@ -53,6 +55,7 @@ class ThreadPerTaskExecutor implements Executor {
 public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSupport
 {
     /* The core rendering instance */
+    enum TouchMode {DOWN, UP};
     enum TopBarMode {Main, Search, Annot, Delete, More, Accept};
     enum AcceptMode {Highlight, Underline, StrikeOut, Ink, CopyText};
 
@@ -68,6 +71,8 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     private EditText     mFreeTextView;
     private RelativeLayout mBookNotePop;
     private RelativeLayout bookselecttextpop;
+    private RelativeLayout bookselecttextup;
+    private RelativeLayout bookselecttextdown;
     private TextView     mFilenameView;
     private SeekBar      mPageSlider;
     private int          mPageSliderRes;
@@ -82,6 +87,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     private ViewAnimator mButtonsSwitcher;
     private ImageButton  mLinkButton;
     private AcceptMode   mAcceptMode;
+    private TouchMode    mTouchMode = TouchMode.DOWN;
     private ViewAnimator  mAnnotationWrapper;
     private ViewAnimator  mAnnotationConfirm;
     private RelativeLayout  mSearchWrapper;
@@ -98,6 +104,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     private AlertDialog mAlertDialog;
     private FilePicker mFilePicker;
     private Vibrator vibrator;
+    private HashMap mTempMap;   //编辑文本的缓存字典
 
     public void createAlertWaiter() {
         mAlertsActive = true;
@@ -436,7 +443,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
                 }else if(mButtonsVisible){
                     hideButtons();
                 }
-                OnCancelAcceptButtonClick();
+//                OnCancelAcceptButtonClick();
             }
 
             /**
@@ -454,9 +461,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
              * **/
             @Override
             protected void onHit(Hit item) {
-                if(mSearchWrapper.getVisibility() == VISIBLE){
-                    mSearchWrapper.setVisibility(GONE);
-                }
+
             }
 
             /**
@@ -464,7 +469,6 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
              * **/
             float _left;
             float _top;
-            HashMap _map;
             float free_text_font_size = 50;
             @Override
             protected void onFreetextAdd(float x, float y) {
@@ -479,18 +483,18 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
                     MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
 
                     if(!_text.equals("")){
-                        if(_map != null) {
-                            _map.put("text",_text);
-                            _map.put("width",(float)mFreeTextView.getMeasuredWidth());
-                            _map.put("height",(float)mFreeTextView.getMeasuredHeight());
-                            pageView.addFreetextAnnotation(_map);
+                        if(mTempMap != null) {
+                            mTempMap.put("text",_text);
+                            mTempMap.put("width",(float)mFreeTextView.getMeasuredWidth());
+                            mTempMap.put("height",(float)mFreeTextView.getMeasuredHeight());
+                            pageView.addFreetextAnnotation(mTempMap);
                         }else {
                             pageView.addFreetextAnnotation(_left,_top,(float)mFreeTextView.getMeasuredWidth(),(float)mFreeTextView.getMeasuredHeight(),mFreeTextView.getText().toString());
                         }
                     }
 
                     mFreeTextView.setText("");
-                    _map = null;
+                    mTempMap = null;
 
                     if (imm != null)
                         imm.hideSoftInputFromWindow(mFreeTextView.getWindowToken(), 0);
@@ -508,31 +512,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
                 }
             }
 
-            /**
-             * 监听文本批注点击事件
-             * 被点击之后文本删除并还原成EditText
-             *
-             * @param index mFreeText数组的索引
-             * **/
-            @Override
-            protected void onFreetextClick(int index) {
-                _map = MuPDFFreeTextData.mFreetext.get(index);
-                MuPDFFreeTextData.mFreetext.remove(index);
-                float x = (float)_map.get("x");
-                float y = (float)_map.get("y");
 
-                MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mFreeTextView.getLayoutParams();
-                lp.setMargins((int)(x*pageView.getScale())+pageView.getLeft(), (int)(y*pageView.getScale())+pageView.getTop(),0,0);
-                mFreeTextView.setLayoutParams(lp);
-                mFreeTextView.setText((String)_map.get("text"));
-                mFreeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,(float)_map.get("size")*pageView.getScale());
-                mFreeTextView.setVisibility(View.VISIBLE);
-
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null)
-                    imm.showSoftInput(mFreeTextView, 0);
-            }
         };
         /**
          * !important
@@ -557,6 +537,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
                 MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
                 if (pageView != null)
                     pageView.selectText(viewX, viewY, viewX, viewY);
+                mTouchMode = TouchMode.DOWN;
             }
 
             @Override
@@ -569,56 +550,110 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
             }
 
             @Override
-            public void singleTapOnPdfAnnotation(RectF rect, float scale){
-              MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-              if(rect != null) {
-                  float docRelX = rect.left * scale + pageView.getLeft();
-                  float docRelY = rect.top * scale + pageView.getTop();
-
-                  if(mDocView.mMode == MuPDFReaderView.Mode.Selecting){
-                      bookselecttextpop.setVisibility(View.VISIBLE);
-
-                      if(docRelX<0){
-                          bookselecttextpop.setX(0);
-                      }else if(mDocView.getWidth() - docRelX <  bookselecttextpop.getMeasuredWidth()){
-                          bookselecttextpop.setX(mDocView.getWidth()-bookselecttextpop.getMeasuredWidth());
-                      }else {
-                          bookselecttextpop.setX(docRelX);
-                      }
-
-                      if(docRelY<bookselecttextpop.getMeasuredHeight()){
-                          bookselecttextpop.setY((rect.bottom-rect.top) * scale+docRelY);
-                      }else {
-                          bookselecttextpop.setY(docRelY-bookselecttextpop.getMeasuredHeight());
-                      }
-                  }else {
-                      mBookNotePop.setVisibility(View.VISIBLE);
-
-                      if(docRelX<0){
-                          mBookNotePop.setX(0);
-                      }else if(mDocView.getWidth() - docRelX <  mBookNotePop.getMeasuredWidth()){
-                          mBookNotePop.setX(mDocView.getWidth()-mBookNotePop.getMeasuredWidth());
-                      }else {
-                          mBookNotePop.setX(docRelX);
-                      }
-
-                      if(docRelY<mBookNotePop.getMeasuredHeight()){
-                          mBookNotePop.setY((rect.bottom-rect.top) * scale+docRelY);
-                      }else {
-                          mBookNotePop.setY(docRelY-mBookNotePop.getMeasuredHeight());
-                      }
-                  }
-              }
-            }
-
-            @Override
-            public void touchMoveOnPdfAnnotation(){
-
-            }
-
-            @Override
             public void pageChanged(int page){
 
+            }
+
+            @Override
+            public void touchDown(RectF rect, float scale){
+                MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+                if(rect != null) {
+                    float docRelX = rect.left * scale + pageView.getLeft()-bookselecttextup.getWidth()/2;
+                    float docRelY = rect.top * scale + pageView.getTop();
+                    float docRelRight = rect.right * scale + pageView.getLeft()-bookselecttextdown.getWidth()/2;
+                    float docRelBottom = rect.bottom * scale + pageView.getTop();
+                    if(mDocView.mMode == MuPDFReaderView.Mode.Selecting){
+                        bookselecttextup.setVisibility(View.VISIBLE);
+                        bookselecttextup.setX(docRelX);
+                        bookselecttextup.setY(docRelY-bookselecttextup.getMeasuredHeight());
+
+                        bookselecttextdown.setVisibility(View.VISIBLE);
+                        if(rect.bottom>0){
+                            bookselecttextdown.setX(docRelRight);
+                            bookselecttextdown.setY(docRelBottom);
+                        }
+
+                        if(docRelX<0){
+                            bookselecttextpop.setX(0);
+                        }else if(mDocView.getWidth() - docRelX <  bookselecttextpop.getMeasuredWidth()){
+                            bookselecttextpop.setX(mDocView.getWidth()-bookselecttextpop.getMeasuredWidth());
+                        }else {
+                            bookselecttextpop.setX(docRelX);
+                        }
+
+                        if(docRelY<(bookselecttextpop.getMeasuredHeight()+bookselecttextdown.getMeasuredHeight())){
+                            bookselecttextpop.setY((rect.bottom-rect.top) * scale+docRelY+bookselecttextdown.getMeasuredHeight());
+                        }else {
+                            bookselecttextpop.setY(docRelY-bookselecttextpop.getMeasuredHeight()-bookselecttextdown.getMeasuredHeight());
+                        }
+                    }else if(mDocView.mMode == MuPDFReaderView.Mode.Viewing){
+                        showBookNotePop();
+
+                        if(docRelX<0){
+                            mBookNotePop.setX(0);
+                        }else if(mDocView.getWidth() - docRelX <  mBookNotePop.getMeasuredWidth()){
+                            mBookNotePop.setX(mDocView.getWidth()-mBookNotePop.getMeasuredWidth());
+                        }else {
+                            mBookNotePop.setX(docRelX);
+                        }
+
+                        if(docRelY<mBookNotePop.getMeasuredHeight()){
+                            mBookNotePop.setY((rect.bottom-rect.top) * scale+docRelY);
+                        }else {
+                            mBookNotePop.setY(docRelY-mBookNotePop.getMeasuredHeight());
+                        }
+                    }
+                }else {
+                    mTouchMode = TouchMode.DOWN;
+                    selectModeOff();
+                }
+            }
+
+            @Override
+            public void touchUp(){
+                mTouchMode = TouchMode.UP;
+                if(mDocView.mMode == MuPDFReaderView.Mode.Selecting) {
+                    bookselecttextpop.setVisibility(View.VISIBLE);
+                    bookselecttextdown.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View view, MotionEvent motionEvent) {
+                            if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                                bookselecttextpop.setVisibility(View.INVISIBLE);
+                            }else if (motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE) {
+                                //设置下标的位置
+                                final float x = bookselecttextdown.getX();
+                                final float y = bookselecttextdown.getY();
+                                MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+                                if (pageView != null)
+                                    pageView.selectText(bookselecttextup.getX(), bookselecttextup.getY()+bookselecttextup.getHeight(),x+motionEvent.getX()-bookselecttextdown.getWidth(), y+motionEvent.getY()-bookselecttextdown.getHeight());
+                            }else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+                                bookselecttextpop.setVisibility(View.VISIBLE);
+                            }
+
+                            return true;
+                        }
+                    });
+
+                    bookselecttextup.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View view, MotionEvent motionEvent) {
+                            if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                                bookselecttextpop.setVisibility(View.INVISIBLE);
+                            }else if (motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE) {
+                                //设置上标的位置
+                                final float x = bookselecttextup.getX();
+                                final float y = bookselecttextup.getY();
+                                MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+                                if (pageView != null)
+                                    pageView.selectText(x+motionEvent.getX()-bookselecttextup.getWidth(), y+motionEvent.getY()+bookselecttextup.getHeight(),bookselecttextdown.getX(), bookselecttextdown.getY());
+                            }else if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP) {
+                                bookselecttextpop.setVisibility(View.VISIBLE);
+                            }
+
+                            return true;
+                        }
+                    });
+                }
             }
 
             @Override
@@ -920,9 +955,33 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         }
     }
 
+    private void showBookNotePop(){
+        final MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        if (pageView != null) {
+            if(pageView.getFreetextIndex()!=-1){
+//                mButtonsView.findViewById(R.id.rly_popbooknotecolor).setVisibility(View.VISIBLE);
+//                mButtonsView.findViewById(R.id.rly_popbooknotestyle).setVisibility(View.VISIBLE);
+                mButtonsView.findViewById(R.id.rly_popbooknoteedit).setVisibility(View.VISIBLE);
+                mButtonsView.findViewById(R.id.rly_popbooknoteedit).setOnClickListener(
+                        new View.OnClickListener() {
+                            public void onClick(View v) {
+                                onFreetextEdit(pageView.getFreetextIndex());
+                            }
+                        }
+                );
+            }else if(pageView.getSelectedAnnotationIndex()!=-1){
+
+            }
+        }
+        mBookNotePop.setVisibility(View.VISIBLE);
+    }
+
     private void hideBookNotePop(){
         if(mBookNotePop.getVisibility() == View.VISIBLE){
             mBookNotePop.setVisibility(View.INVISIBLE);
+            mButtonsView.findViewById(R.id.rly_popbooknotecolor).setVisibility(View.GONE);
+            mButtonsView.findViewById(R.id.rly_popbooknotestyle).setVisibility(View.GONE);
+            mButtonsView.findViewById(R.id.rly_popbooknoteedit).setVisibility(View.GONE);
         }
     }
 
@@ -941,6 +1000,15 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         // Make the ReaderView act on the change to mSearchTaskResult
         // via overridden onChildSetup method.
         mDocView.resetupChildren();
+    }
+
+    private void selectModeOff() {
+        if (bookselecttextpop.getVisibility() == View.VISIBLE) {
+            mDocView.mMode = MuPDFReaderView.Mode.Viewing;
+            bookselecttextpop.setVisibility(View.INVISIBLE);
+            bookselecttextdown.setVisibility(View.INVISIBLE);
+            bookselecttextup.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void updatePageNumView(int index) {
@@ -993,7 +1061,11 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         mFilenameView = (TextView)mButtonsView.findViewById(R.id.docNameText);//done
         mFreeTextView = (EditText)mButtonsView.findViewById(R.id.freeText);//done
         mBookNotePop = (RelativeLayout)mButtonsView.findViewById(R.id.booknotepop);//done
+
         bookselecttextpop = (RelativeLayout)mButtonsView.findViewById(R.id.bookselecttextpop);//done
+        bookselecttextup = (RelativeLayout)mButtonsView.findViewById(R.id.bookselecttextup);//done
+        bookselecttextdown = (RelativeLayout)mButtonsView.findViewById(R.id.bookselecttextdown);//done
+
         mPageSlider = (SeekBar)mButtonsView.findViewById(R.id.pageSlider);//done
         mPageNumberView = (TextView)mButtonsView.findViewById(R.id.pageNumber);//done
         mInfoView = (TextView)mButtonsView.findViewById(R.id.info);
@@ -1020,6 +1092,8 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         mFreeTextView.measure(0,0);
         mBookNotePop.setVisibility(View.INVISIBLE);
         bookselecttextpop.setVisibility(View.INVISIBLE);
+        bookselecttextup.setVisibility(View.INVISIBLE);
+        bookselecttextdown.setVisibility(View.INVISIBLE);
     }
 
 
@@ -1036,6 +1110,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
         if (pageView != null)
             pageView.deleteSelectedAnnotation();
+        hideBookNotePop();
     }
 
     private void showKeyboard() {
@@ -1220,7 +1295,56 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
             pageView.deselectText();
             pageView.cancelDraw();
         }
+        selectModeOff();
         mDocView.setMode(MuPDFReaderView.Mode.Viewing);
+    }
+
+    //保存为下划线
+    public void onUnderlineSave(View v){
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        if (pageView != null)
+            pageView.markupSelection(Annotation.Type.UNDERLINE);
+        selectModeOff();
+    }
+
+    //保存为高亮
+    public void onHighlightSave(View v){
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        if (pageView != null)
+            pageView.markupSelection(Annotation.Type.HIGHLIGHT);
+        selectModeOff();
+    }
+
+    //选择复制按钮
+    public void onCopyTextSave(View v){
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        if (pageView != null)
+            pageView.copySelection();
+        showInfo("文字复制成功");
+        selectModeOff();
+    }
+
+    //文本编辑
+    protected void onFreetextEdit(int index) {
+        mDocView.setMode(MuPDFReaderView.Mode.Freetexting);
+        mTempMap = MuPDFFreeTextData.mFreetext.get(index);
+        MuPDFFreeTextData.mFreetext.remove(index);
+        float x = (float)mTempMap.get("x");
+        float y = (float)mTempMap.get("y");
+
+        MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mFreeTextView.getLayoutParams();
+        lp.setMargins((int)(x*pageView.getScale())+pageView.getLeft(), (int)(y*pageView.getScale())+pageView.getTop(),0,0);
+        mFreeTextView.setLayoutParams(lp);
+        mFreeTextView.setText((String)mTempMap.get("text"));
+        mFreeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,(float)mTempMap.get("size")*pageView.getScale());
+        mFreeTextView.setVisibility(View.VISIBLE);
+
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null)
+            imm.showSoftInput(mFreeTextView, 0);
+
+        selectModeOff();
     }
 
     //上下bar添加点击事件可防止canvas onPassClick事件冒泡

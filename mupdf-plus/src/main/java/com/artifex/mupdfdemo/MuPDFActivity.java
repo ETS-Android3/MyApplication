@@ -501,32 +501,6 @@ public class MuPDFActivity extends Activity implements FilePicker.FilePickerSupp
 						imm.showSoftInput(mFreeTextView, 0);
 				}
 			}
-
-			/**
-			 * 监听文本批注点击事件
-			 * 被点击之后文本删除并还原成EditText
-			 *
-			 * @param index mFreeText数组的索引
-			 * **/
-			@Override
-			protected void onFreetextClick(int index) {
-				_map = MuPDFFreeTextData.mFreetext.get(index);
-				MuPDFFreeTextData.mFreetext.remove(index);
-				float x = (float)_map.get("x");
-				float y = (float)_map.get("y");
-
-				MuPDFView pageView = (MuPDFView) mDocView.getDisplayedView();
-				RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mFreeTextView.getLayoutParams();
-				lp.setMargins((int)(x*pageView.getScale())+pageView.getLeft(), (int)(y*pageView.getScale())+pageView.getTop(),0,0);
-				mFreeTextView.setLayoutParams(lp);
-                mFreeTextView.setText((String)_map.get("text"));
-				mFreeTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,(float)_map.get("size")*pageView.getScale());
-                mFreeTextView.setVisibility(View.VISIBLE);
-
-				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-				if (imm != null)
-					imm.showSoftInput(mFreeTextView, 0);
-			}
 		};
 		/**
 		 * !important

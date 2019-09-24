@@ -26,7 +26,6 @@ public class MuPDFReaderView extends ReaderView {
 	protected void onDocMotion() {}
 	protected void onHit(Hit item) {}
 	protected void onFreetextAdd(float x, float y) {}
-	protected void onFreetextClick(int index) {}
 
 	public void setLinksEnabled(boolean b) {
 		mLinksEnabled = b;
@@ -71,11 +70,10 @@ public class MuPDFReaderView extends ReaderView {
 
 	public boolean onSingleTapUp(MotionEvent e) {
 		LinkInfo link = null;
-
+		MuPDFView pageView = (MuPDFView) getDisplayedView();
+		Hit item = pageView.passClickEvent(e.getX(), e.getY());
+		onHit(item);
 		if (mMode == Mode.Viewing && !tapDisabled) {
-			MuPDFView pageView = (MuPDFView) getDisplayedView();
-			Hit item = pageView.passClickEvent(e.getX(), e.getY());
-			onHit(item);
 			if (item == Hit.Nothing) {
 				if (mLinksEnabled && pageView != null
 				&& (link = pageView.hitLink(e.getX(), e.getY())) != null) {
@@ -109,15 +107,11 @@ public class MuPDFReaderView extends ReaderView {
 				} else {
 					onTapMainDocArea();
 				}
-//			}else if(item == Hit.FreeText) {
-//				onFreetextClick(pageView.getFreetextIndex());
-//				setMode(Mode.Freetexting);
             }
 		}else if (mMode == Mode.Freetexting) {
 			onFreetextAdd(e.getX(), e.getY());
 		}else if (mMode == Mode.Selecting) {
             mMode = Mode.Viewing;
-            MuPDFView pageView = (MuPDFView) getDisplayedView();
             pageView.deselectText();
 		}
 		return super.onSingleTapUp(e);
@@ -183,22 +177,19 @@ public class MuPDFReaderView extends ReaderView {
 
 	public boolean onTouchEvent(MotionEvent event) {
 
-		if ( mMode == Mode.Drawing )
+		float x = event.getX();
+		float y = event.getY();
+		switch (event.getAction())
 		{
-			float x = event.getX();
-			float y = event.getY();
-			switch (event.getAction())
-			{
-				case MotionEvent.ACTION_DOWN:
-					touch_start(x, y);
-					break;
-				case MotionEvent.ACTION_MOVE:
-					touch_move(x, y);
-					break;
-				case MotionEvent.ACTION_UP:
-					touch_up();
-					break;
-			}
+			case MotionEvent.ACTION_DOWN:
+				touch_start(x, y);
+				break;
+			case MotionEvent.ACTION_MOVE:
+				touch_move(x, y);
+				break;
+			case MotionEvent.ACTION_UP:
+				touch_up();
+				break;
 		}
 
 		if ( mMode == Mode.Selecting && isLongPressed )
@@ -227,35 +218,35 @@ public class MuPDFReaderView extends ReaderView {
 	private static final float TOUCH_TOLERANCE = 2;
 
 	private void touch_start(float x, float y) {
-
-		MuPDFView pageView = (MuPDFView)getDisplayedView();
-		if (pageView != null)
-		{
-			pageView.startDraw(x, y);
-		}
-		mX = x;
-		mY = y;
-	}
-
-	private void touch_move(float x, float y) {
-
-		float dx = Math.abs(x - mX);
-		float dy = Math.abs(y - mY);
-		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE)
-		{
-			MuPDFView pageView = (MuPDFView)getDisplayedView();
-			if (pageView != null)
-			{
-				pageView.continueDraw(x, y);
+		if ( mMode == Mode.Drawing ) {
+			MuPDFView pageView = (MuPDFView) getDisplayedView();
+			if (pageView != null) {
+				pageView.startDraw(x, y);
 			}
 			mX = x;
 			mY = y;
 		}
 	}
 
-	private void touch_up() {
+	private void touch_move(float x, float y) {
+		if ( mMode == Mode.Drawing ) {
+			float dx = Math.abs(x - mX);
+			float dy = Math.abs(y - mY);
+			if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+				MuPDFView pageView = (MuPDFView) getDisplayedView();
+				if (pageView != null) {
+					pageView.continueDraw(x, y);
+				}
+				mX = x;
+				mY = y;
+			}
+		}
+	}
 
-		// NOOP
+	private void touch_up() {
+		if(eventCallback != null){
+			eventCallback.touchUp();
+		}
 	}
 
 	protected void onChildSetup(int i, View v) {

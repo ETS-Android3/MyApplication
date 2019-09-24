@@ -40,6 +40,7 @@ public interface MuPDFView {
 	public void addFreetextAnnotation(float x, float y, float width, float height, String text);
 	public void addFreetextAnnotation(HashMap map);
 	public int getFreetextIndex();
+	public int getSelectedAnnotationIndex();
 	public float getScale();
 	public int getTop();
 	public int getLeft();

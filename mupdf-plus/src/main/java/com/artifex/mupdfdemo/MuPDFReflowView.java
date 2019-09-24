@@ -165,7 +165,10 @@ public class MuPDFReflowView extends WebView implements MuPDFView {
 	}
 
 	public int getFreetextIndex() {
-		return 0;
+		return -1;
+	}
+	public int getSelectedAnnotationIndex() {
+		return -1;
 	}
 
 	@Override

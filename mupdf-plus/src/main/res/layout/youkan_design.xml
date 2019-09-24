@@ -38,10 +38,34 @@
         android:id="@+id/booknotepop"
         layout="@layout/booknotepop" />
 
+    <!--长按弹出菜单-->
+    <RelativeLayout
+        android:id="@+id/bookselecttextdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onBubbling">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/selecttextdown" />
+    </RelativeLayout>
+
     <include
         android:id="@+id/bookselecttextpop"
         layout="@layout/bookselecttextpop" />
 
+    <RelativeLayout
+        android:id="@+id/bookselecttextup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onBubbling">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/selecttextup" />
+    </RelativeLayout>
+
+    <!--当前操作信息-->
     <TextView
         android:id="@+id/info"
         android:layout_width="wrap_content"

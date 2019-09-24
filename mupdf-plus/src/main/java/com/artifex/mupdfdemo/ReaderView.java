@@ -66,7 +66,7 @@ public class ReaderView
 	private int               mScrollerLastY;
 
     private PageView currentPage;
-    private DigitalizedEventCallback eventCallback;
+	protected DigitalizedEventCallback eventCallback;
 
     private float             mLastTouchX;
     private float             mLastTouchY;
