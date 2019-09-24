@@ -17,4 +17,5 @@ public interface DigitalizedEventCallback {
     public void error(String message);
     public void touchUp();
     public void touchDown(RectF rect, float scale);
+    public void touchMove(RectF rect, float scale);
 }

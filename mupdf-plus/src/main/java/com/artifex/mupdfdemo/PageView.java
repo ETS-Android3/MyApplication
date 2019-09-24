@@ -373,7 +373,7 @@ public abstract class PageView extends ViewGroup {
                                 if (!rect.isEmpty())
                                     canvas.drawRect(rect.left * scale, rect.top * scale, rect.right * scale, rect.bottom * scale, paint);
                                     if (eventCallback != null)
-                                        eventCallback.touchDown(new RectF(mSelectFirstRect.left,mSelectFirstRect.top,rect.right,rect.bottom),scale);
+                                        eventCallback.touchMove(new RectF(mSelectFirstRect.left,mSelectFirstRect.top,rect.right,rect.bottom),scale);
                             }
                         });
                     }
@@ -635,6 +635,7 @@ public abstract class PageView extends ViewGroup {
         if (eventCallback != null) {
             float scale = mSourceScale * (float) getWidth() / (float) mSize.x;
             eventCallback.touchDown(rect,scale);
+            deselectText();
         }
 
         mItemSelectBox = rect;
