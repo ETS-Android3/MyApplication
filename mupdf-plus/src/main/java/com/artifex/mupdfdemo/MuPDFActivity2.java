@@ -1274,9 +1274,9 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
     }
     //文本
     public void onAnnotationFreetext(View v){
+        mDocView.setMode(MuPDFReaderView.Mode.Freetexting);
         slideDownToHide(mAnnotationWrapper);
         showInfo("添加文本批注");
-        mDocView.setMode(MuPDFReaderView.Mode.Freetexting);
     }
 
     //保存当前墨迹

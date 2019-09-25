@@ -71,9 +71,9 @@ public class MuPDFReaderView extends ReaderView {
 	public boolean onSingleTapUp(MotionEvent e) {
 		LinkInfo link = null;
 		MuPDFView pageView = (MuPDFView) getDisplayedView();
-		Hit item = pageView.passClickEvent(e.getX(), e.getY());
-		onHit(item);
 		if (mMode == Mode.Viewing && !tapDisabled) {
+			Hit item = pageView.passClickEvent(e.getX(), e.getY());
+			onHit(item);
 			if (item == Hit.Nothing) {
 				if (mLinksEnabled && pageView != null
 				&& (link = pageView.hitLink(e.getX(), e.getY())) != null) {
@@ -112,7 +112,8 @@ public class MuPDFReaderView extends ReaderView {
 			onFreetextAdd(e.getX(), e.getY());
 		}else if (mMode == Mode.Selecting) {
             mMode = Mode.Viewing;
-            pageView.deselectText();
+			Hit item = pageView.passClickEvent(e.getX(), e.getY());
+			onHit(item);
 		}
 		return super.onSingleTapUp(e);
 	}
