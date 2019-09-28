@@ -1,0 +1,51 @@
+description = 'fragment-ui'
+
+buildscript {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.4.2'
+    }
+}
+
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/jcenter' }
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    mavenCentral()
+    maven { url 'http://repo1.maven.org/maven2' }
+}
+
+apply plugin: 'com.android.library'
+
+def _ext = rootProject.ext
+
+def _compileSdkVersion = _ext.has('compileSdkVersion') ? _ext.compileSdkVersion : 28
+def _buildToolsVersion = _ext.has('buildToolsVersion') ? _ext.buildToolsVersion : '28.0.0'
+def _minSdkVersion = _ext.has('minSdkVersion') ? _ext.minSdkVersion : 16
+def _targetSdkVersion = _ext.has('targetSdkVersion') ? _ext.targetSdkVersion : 22
+
+android {
+    compileSdkVersion _compileSdkVersion
+    buildToolsVersion _buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion _minSdkVersion
+        targetSdkVersion _targetSdkVersion
+    }
+
+    lintOptions {
+        abortOnError true
+    }
+}
+
+configurations {
+    deployerJars
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:${_buildToolsVersion}"
+}
