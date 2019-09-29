@@ -5,6 +5,11 @@
     android:layout_height="fill_parent"
     android:background="#FF5722">
 
-
+    <Button
+        android:id="@+id/buttons"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="从fragment中启动activity"
+        android:onClick="openActivity"/>
 
 </LinearLayout>

@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-        <activity android:name="com.github.react.sextant.fragment.MainActivity">
+        <activity android:name="com.github.react.sextant.fragment.FragmentMangerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
