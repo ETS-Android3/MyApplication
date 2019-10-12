@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.artifex.mupdfdemo.MuPDFReaderView
+    <com.artifex.mupdfdemo.RCTView
         android:id="@+id/mu_pdf_mupdfreaderview"
-        android:layout_width="200dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
 </RelativeLayout>
