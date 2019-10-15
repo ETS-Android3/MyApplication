@@ -1,2 +1,2 @@
 include ':app'
-include ':mupdf-view'
+include ':fragment-ui'
