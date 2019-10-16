@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.github.react.sextant.fragment.util.Crime;
+
 public class CrimeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -28,6 +30,20 @@ public class CrimeActivity extends AppCompatActivity {
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if(fragment == null) {
             fragment = new CrimeFragment();
+            /**
+             * fragment argument
+             *
+             * 必须在fragment创建后、添加给activity前完成
+             * 使用getArguments()获得传递的数据
+             *
+             * 优点：比额外空间好在 回收内存时还要考虑实例变量会不会被回收
+             *
+             * setArguments方法常写在Fragments的静态方法内,比如newInstance(),getInstance()
+             * **/
+            Bundle args = new Bundle();
+            args.putInt("FragmentArgsInt",1234);
+            args.putString("FragmentArgsString",new Crime().getId().toString());
+            fragment.setArguments(args);
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit();

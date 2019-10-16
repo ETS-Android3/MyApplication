@@ -17,7 +17,6 @@ public class CrimeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){//这里的onCreate是公共方法，在Activity内是受保护方法
         super.onCreate(savedInstanceState);
-//        getArguments().getString("FragmentArgsString","ABCD");
     }
 
     /**
@@ -42,18 +41,7 @@ public class CrimeFragment extends Fragment {
 
         //使用额外空间数据进行传递
         EditText a = (EditText)v.findViewById(R.id.mEditText);
-        a.setText(new Crime().getId().toString());
-
-
-        a.setText(saveInstanceState.getString("FragmentArgsString","ABCD"));
-
-        /**
-         * fragment argument
-         * **/
-        Bundle args = new Bundle();
-        args.putInt("FragmentArgsInt",1234);
-        args.putString("FragmentArgsString",new Crime().getId().toString());
-        this.setArguments(args);
+        a.setText(getArguments().getString("FragmentArgsString","ABCD"));
 
         return v;
     }
