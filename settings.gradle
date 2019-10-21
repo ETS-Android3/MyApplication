@@ -1,2 +1,4 @@
 include ':app'
-include ':fragment-ui'
+include ':recycler-view'
+//include ':fragment-ui'
+//include ':mupdf-view'
