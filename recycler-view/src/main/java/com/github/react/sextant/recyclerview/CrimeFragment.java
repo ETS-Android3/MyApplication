@@ -95,7 +95,9 @@ public class CrimeFragment extends Fragment {
     }
 
     /**
-     * 定义Adapter内部类
+     * 定义RecyclerView.Adapter内部类
+     *
+     * 借助Adapter提供视图
      * **/
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
 
