@@ -25,10 +25,10 @@ android {
 
 
 dependencies {
-    compile project(':viewpager-view')
-    compile project(':recycler-view')
+//    compile project(':viewpager-view')
+//    compile project(':recycler-view')
 //    compile project(':fragment-ui')
-//    compile project(':mupdf-view')
+    compile project(':mupdf-view')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'

@@ -9,8 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/recycler-view" />
-            <option value="$PROJECT_DIR$/viewpager-view" />
+            <option value="$PROJECT_DIR$/mupdf-view" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

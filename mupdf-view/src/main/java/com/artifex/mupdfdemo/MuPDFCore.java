@@ -63,7 +63,7 @@ public class MuPDFCore
 	private native LinkInfo [] getPageLinksInternal(int page);
 	private native RectF[] getWidgetAreasInternal(int page);
 	private native Annotation[] getAnnotationsInternal(int page);
-	private native OutlineItem [] getOutlineInternal();
+//	private native OutlineItem [] getOutlineInternal();
 	private native boolean hasOutlineInternal();
 	private native boolean needsPasswordInternal();
 	private native boolean authenticatePasswordInternal(String password);
@@ -211,23 +211,23 @@ public class MuPDFCore
 		updatePageInternal(bm, page, pageW, pageH, patchX, patchY, patchW, patchH, cookie.cookiePtr);
 	}
 
-	public synchronized PassClickResult passClickEvent(int page, float x, float y) {
-		boolean changed = passClickEventInternal(page, x, y) != 0;
-
-		switch (WidgetType.values()[getFocusedWidgetTypeInternal()])
-		{
-		case TEXT:
-			return new PassClickResultText(changed, getFocusedWidgetTextInternal());
-		case LISTBOX:
-		case COMBOBOX:
-			return new PassClickResultChoice(changed, getFocusedWidgetChoiceOptions(), getFocusedWidgetChoiceSelected());
-		case SIGNATURE:
-			return new PassClickResultSignature(changed, getFocusedWidgetSignatureState());
-		default:
-			return new PassClickResult(changed);
-		}
-
-	}
+//	public synchronized PassClickResult passClickEvent(int page, float x, float y) {
+//		boolean changed = passClickEventInternal(page, x, y) != 0;
+//
+//		switch (WidgetType.values()[getFocusedWidgetTypeInternal()])
+//		{
+//		case TEXT:
+//			return new PassClickResultText(changed, getFocusedWidgetTextInternal());
+//		case LISTBOX:
+//		case COMBOBOX:
+//			return new PassClickResultChoice(changed, getFocusedWidgetChoiceOptions(), getFocusedWidgetChoiceSelected());
+//		case SIGNATURE:
+//			return new PassClickResultSignature(changed, getFocusedWidgetSignatureState());
+//		default:
+//			return new PassClickResult(changed);
+//		}
+//
+//	}
 
 	public synchronized boolean setFocusedWidgetText(int page, String text) {
 		boolean success;
@@ -328,9 +328,9 @@ public class MuPDFCore
 		return hasOutlineInternal();
 	}
 
-	public synchronized OutlineItem [] getOutline() {
-		return getOutlineInternal();
-	}
+//	public synchronized OutlineItem [] getOutline() {
+//		return getOutlineInternal();
+//	}
 
 	public synchronized boolean needsPassword() {
 		return needsPasswordInternal();

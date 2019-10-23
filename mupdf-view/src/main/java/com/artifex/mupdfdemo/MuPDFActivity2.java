@@ -7,16 +7,13 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 
-public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSupport{
+public class MuPDFActivity2 extends Activity {
 
     private final int    OUTLINE_REQUEST=0;
     private final int    PRINT_REQUEST=1;
     private final int    FILEPICK_REQUEST=2;
 
     private MuPDFCore    muPDFCore;
-    private MuPDFReaderView muPDFReaderView;
-
-    private FilePicker mFilePicker;
 
     private String filePath = Environment.getExternalStorageDirectory() + "/Download/pdf_t2.pdf"; // 文件路径
 
@@ -33,8 +30,7 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         }
 
         setContentView(R.layout.youkan_view);
-        muPDFReaderView = (MuPDFReaderView)findViewById(R.id.mu_pdf_mupdfreaderview);
-        muPDFReaderView.setAdapter(new MuPDFPageAdapter(this, this,muPDFCore));
+
     }
 
     /**
@@ -46,7 +42,6 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
 
         try {
             muPDFCore = new MuPDFCore(this, path);
-            OutlineActivityData.set(null);
         } catch (Exception e) {
             return null;
         } catch (OutOfMemoryError e) {
@@ -55,11 +50,4 @@ public class MuPDFActivity2 extends Activity implements FilePicker.FilePickerSup
         return muPDFCore;
     }
 
-    @Override
-    public void performPickFor(FilePicker picker) {
-        mFilePicker = picker;
-        Intent intent = new Intent(this, ChoosePDFActivity.class);
-        intent.setAction(ChoosePDFActivity.PICK_KEY_FILE);
-        startActivityForResult(intent, FILEPICK_REQUEST);
-    }
 }
