@@ -1,6 +1,6 @@
 include ':app'
 //include ':viewpager-view'
-//include ':recycler-view'
+include ':recycler-view'
 //include ':fragment-ui'
 //include ':mupdf-view'
-include ':alert-dialog'
+//include ':alert-dialog'
