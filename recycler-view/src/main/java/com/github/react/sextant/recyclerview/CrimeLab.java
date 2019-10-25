@@ -28,13 +28,13 @@ public class CrimeLab {
     private CrimeLab(Context context){
         mCrimeList = new ArrayList<>();
 
-        //pull data
-        for(int i=0;i<100;i++){
-            Crime crime = new Crime();
-            crime.setTitle("Crime #" + i);
-            crime.setSolved(i % 2 == 0);    //Every other one 偶数为true
-            mCrimeList.add(crime);
-        }
+//        //pull data
+//        for(int i=0;i<100;i++){
+//            Crime crime = new Crime();
+//            crime.setTitle("Crime #" + i);
+//            crime.setSolved(i % 2 == 0);    //Every other one 偶数为true
+//            mCrimeList.add(crime);
+//        }
     }
 
     public List<Crime> getmCrimeList(){
@@ -49,5 +49,9 @@ public class CrimeLab {
         }
 
         return null;
+    }
+
+    public void addCrime(Crime c){
+        mCrimeList.add(c);
     }
 }

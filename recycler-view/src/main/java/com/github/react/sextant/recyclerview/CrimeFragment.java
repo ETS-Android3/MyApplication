@@ -1,5 +1,6 @@
 package com.github.react.sextant.recyclerview;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -20,6 +22,7 @@ public class CrimeFragment extends Fragment {
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mCrimeAdapter;
+    private CrimeLab mCrimeLab = CrimeLab.get(getActivity());
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,8 +48,7 @@ public class CrimeFragment extends Fragment {
          * **/
         mCrimeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        CrimeLab crimeLab = CrimeLab.get(getActivity());
-        List<Crime> crimeList = crimeLab.getmCrimeList();
+        List<Crime> crimeList = mCrimeLab.getmCrimeList();
         mCrimeAdapter = new CrimeAdapter(crimeList);
         mCrimeRecyclerView.setAdapter(mCrimeAdapter);
 
@@ -60,6 +62,21 @@ public class CrimeFragment extends Fragment {
 
         //将XML资源填充到Menu中
         inflater.inflate(R.menu.fragment_crime_list, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.new_crime) {
+            Crime crime = new Crime();
+            crime.setTitle("Crime #" + mCrimeLab.getmCrimeList().size());
+            crime.setSolved(mCrimeLab.getmCrimeList().size() % 2 == 0);
+            mCrimeLab.addCrime(crime);
+            List<Crime> crimeList = mCrimeLab.getmCrimeList();
+            mCrimeAdapter = new CrimeAdapter(crimeList);
+            mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -105,7 +122,7 @@ public class CrimeFragment extends Fragment {
             Toast.makeText(getActivity(), mCrime.getTitle(),Toast.LENGTH_LONG).show();
 
             //move scrollTo
-            mCrimeRecyclerView.getAdapter().notifyItemMoved(0, 98);
+//            mCrimeRecyclerView.getAdapter().notifyItemMoved(0, 98);
         }
 
 
