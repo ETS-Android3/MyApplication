@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle_format">subtitle</string>
+    <string name="hide_subtitle">hide subtitle</string>
+    <string name="show_subtitle">show subtitle</string>
+</resources>

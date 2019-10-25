@@ -1,10 +1,12 @@
 package com.github.react.sextant.recyclerview;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.react.sextant.viewpager.CrimePagerActivity;
+
 import java.util.List;
 
 public class CrimeFragment extends Fragment {
@@ -23,6 +27,9 @@ public class CrimeFragment extends Fragment {
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mCrimeAdapter;
     private CrimeLab mCrimeLab = CrimeLab.get(getActivity());
+
+    private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
+    private boolean mSubtitleVisible = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,6 +40,12 @@ public class CrimeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle saveInstanceState){
+        //选择设备时
+        if(saveInstanceState != null){
+            mSubtitleVisible = saveInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE);
+        }
+
+
         View v = inflater.inflate(R.layout.fragment_crime_list, container, false);
 
         mCrimeRecyclerView = (RecyclerView) v.findViewById(R.id.crime_recycler_view);
@@ -52,8 +65,18 @@ public class CrimeFragment extends Fragment {
         mCrimeAdapter = new CrimeAdapter(crimeList);
         mCrimeRecyclerView.setAdapter(mCrimeAdapter);
 
-
+        updateSubtitle();
         return v;
+    }
+
+    /**
+     * 存储state
+     * **/
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        System.out.println("LUOKUNL: "+mSubtitleVisible);
+        outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
     }
 
     @Override
@@ -62,6 +85,13 @@ public class CrimeFragment extends Fragment {
 
         //将XML资源填充到Menu中
         inflater.inflate(R.menu.fragment_crime_list, menu);
+
+        MenuItem subtitleItem = menu.findItem(R.id.show_subtitle);
+        if(mSubtitleVisible){
+            subtitleItem.setTitle(R.string.hide_subtitle);
+        }else {
+            subtitleItem.setTitle(R.string.show_subtitle);
+        }
     }
 
     @Override
@@ -71,10 +101,14 @@ public class CrimeFragment extends Fragment {
             crime.setTitle("Crime #" + mCrimeLab.getmCrimeList().size());
             crime.setSolved(mCrimeLab.getmCrimeList().size() % 2 == 0);
             mCrimeLab.addCrime(crime);
-            List<Crime> crimeList = mCrimeLab.getmCrimeList();
-            mCrimeAdapter = new CrimeAdapter(crimeList);
-            mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
+            startActivity(intent);
             return true;
+        }else if(item.getItemId() == R.id.show_subtitle){
+            getActivity().invalidateOptionsMenu();
+            mSubtitleVisible = !mSubtitleVisible;
+            updateSubtitle();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -163,5 +197,21 @@ public class CrimeFragment extends Fragment {
         public int getItemCount() {
             return mCrimeList.size();
         }
+    }
+
+    /**
+     * 设置工具栏子标题
+     * **/
+    private void updateSubtitle(){
+        CrimeLab crimeLab = CrimeLab.get(getActivity());
+        int crimeCount = crimeLab.getmCrimeList().size();
+        @SuppressLint({"StringFormatInvalid", "LocalSuppress"}) String subtitle = getString(R.string.subtitle_format, crimeCount);
+
+        if(!mSubtitleVisible){
+            subtitle = null;
+        }
+
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.getSupportActionBar().setSubtitle(subtitle);
     }
 }

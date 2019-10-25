@@ -7,6 +7,10 @@
         android:title="新增"
         app:showAsAction="ifRoom|withText"/>
 
+    <item
+        android:id="@+id/show_subtitle"
+        android:title="@string/subtitle_format"
+        app:showAsAction="ifRoom"/>
 </menu>
 
-<!--    android:icon="@android:drawable/ic_menu_add"-->
+<!--line 6:  android:icon="@android:drawable/ic_menu_add"-->

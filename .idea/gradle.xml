@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/recycler-view" />
+            <option value="$PROJECT_DIR$/viewpager-view" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

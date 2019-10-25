@@ -1,5 +1,7 @@
 package com.github.react.sextant.viewpager;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,10 +13,15 @@ import android.support.v7.app.AppCompatActivity;
 import com.github.react.sextant.recyclerview.Crime;
 import com.github.react.sextant.recyclerview.CrimeFragment;
 import com.github.react.sextant.recyclerview.CrimeLab;
+import com.github.react.sextant.recyclerview.R;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CrimePagerActivity extends AppCompatActivity {
+
+    private static final String EXTRA_UUID =
+            "com.github.react.sextant.viewpager.uuid";
 
     private ViewPager mViewPager;
     private List<Crime> mCrimes;
@@ -45,5 +52,11 @@ public class CrimePagerActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public static Intent newIntent(Context packageContext, UUID uuid){
+        Intent intent = new Intent(packageContext,CrimePagerActivity.class);
+        intent.putExtra(EXTRA_UUID, uuid);
+        return intent;
     }
 }

@@ -1,5 +1,5 @@
 include ':app'
-//include ':viewpager-view'
+include ':viewpager-view'
 include ':recycler-view'
 //include ':fragment-ui'
 //include ':mupdf-view'
