@@ -1,6 +1,7 @@
 include ':app'
 include ':viewpager-view'
 include ':recycler-view'
+include ':headless-service'
 //include ':fragment-ui'
 //include ':mupdf-view'
 //include ':alert-dialog'
