@@ -1,0 +1,57 @@
+description = 'aria-download'
+
+buildscript {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.4.2'
+    }
+}
+
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/jcenter' }
+    maven { url 'https://maven.aliyun.com/repository/google' }
+    mavenCentral()
+    maven { url 'http://repo1.maven.org/maven2' }
+}
+
+apply plugin: 'com.android.library'
+
+def _ext = rootProject.ext
+
+def _compileSdkVersion = _ext.has('compileSdkVersion') ? _ext.compileSdkVersion : 28
+def _buildToolsVersion = _ext.has('buildToolsVersion') ? _ext.buildToolsVersion : '28.0.0'
+def _minSdkVersion = _ext.has('minSdkVersion') ? _ext.minSdkVersion : 16
+def _targetSdkVersion = _ext.has('targetSdkVersion') ? _ext.targetSdkVersion : 22
+
+android {
+    compileSdkVersion _compileSdkVersion
+    buildToolsVersion _buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion _minSdkVersion
+        targetSdkVersion _targetSdkVersion
+    }
+
+    lintOptions {
+        abortOnError true
+    }
+}
+
+configurations {
+    deployerJars
+}
+
+dependencies {
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.arialyy.aria:Aria:3.1.1'
+//    implementation 'com.arialyy.aria:core:3.8.6'
+    annotationProcessor 'com.arialyy.aria:compiler:3.8.6'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:${_buildToolsVersion}"
+}

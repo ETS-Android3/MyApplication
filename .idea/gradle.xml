@@ -11,9 +11,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/headless-service" />
-            <option value="$PROJECT_DIR$/recycler-view" />
-            <option value="$PROJECT_DIR$/viewpager-view" />
+            <option value="$PROJECT_DIR$/aria-download" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -25,9 +25,10 @@ android {
 
 
 dependencies {
-    compile project(':viewpager-view')
-    compile project(':recycler-view')
-    compile project(':headless-service')
+    compile project(':aria-download')
+//    compile project(':viewpager-view')
+//    compile project(':recycler-view')
+//    compile project(':headless-service')
 //    compile project(':fragment-ui')
 //    compile project(':mupdf-view')
 //    compile project(':alert-dialog')
