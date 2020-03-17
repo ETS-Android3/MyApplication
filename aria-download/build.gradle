@@ -46,11 +46,7 @@ configurations {
 }
 
 dependencies {
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.arialyy.aria:Aria:3.1.1'
-//    implementation 'com.arialyy.aria:core:3.8.6'
+    implementation 'com.arialyy.aria:core:3.8.6'
     annotationProcessor 'com.arialyy.aria:compiler:3.8.6'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.android.support:appcompat-v7:${_buildToolsVersion}"

@@ -11,14 +11,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
-        <activity android:name="com.github.react.sextant.recyclerview.CrimeListActivity">
+        <activity android:name="com.github.react.sextant.myapplication.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.github.react.sextant.viewpager.CrimePagerActivity"></activity>
+        <activity android:name="com.github.arialyy.ariatest.MainActivity"></activity>
     </application>
 
 </manifest>
