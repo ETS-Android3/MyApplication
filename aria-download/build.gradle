@@ -46,8 +46,7 @@ configurations {
 }
 
 dependencies {
-    implementation 'com.arialyy.aria:core:3.8.6'
-    annotationProcessor 'com.arialyy.aria:compiler:3.8.6'
+    implementation 'com.liulishuo.filedownloader:library:1.7.7'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.android.support:appcompat-v7:${_buildToolsVersion}"
 }
