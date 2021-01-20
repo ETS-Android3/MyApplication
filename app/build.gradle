@@ -25,11 +25,11 @@ android {
 
 
 dependencies {
-    compile project(':aria-download')
+//    compile project(':aria-download')
 //    compile project(':viewpager-view')
 //    compile project(':recycler-view')
 //    compile project(':headless-service')
-//    compile project(':fragment-ui')
+    compile project(':fragment-ui')
 //    compile project(':mupdf-view')
 //    compile project(':alert-dialog')
     implementation fileTree(dir: 'libs', include: ['*.jar'])

@@ -9,7 +9,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = new Intent(this, com.github.arialyy.ariatest.MainActivity.class);
+        Intent intent = new Intent(this, com.github.react.sextant.fragment.CrimeActivity.class);
         startActivity(intent);
     }
 }
