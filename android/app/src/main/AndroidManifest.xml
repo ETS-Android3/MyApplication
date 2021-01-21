@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.github.react.sextant.myapplication">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,8 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon">
-        <activity android:name="com.github.react.sextant.myapplication.MainActivity">
+        tools:replace="android:icon"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="28"
+        >
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,7 +24,16 @@
             </intent-filter>
         </activity>
 <!--        <activity android:name="com.github.arialyy.ariatest.MainActivity"></activity>-->
-        <activity android:name="com.github.react.sextant.fragment.CrimeActivity"></activity>
+<!--        <activity android:name="com.github.react.sextant.fragment.CrimeActivity"></activity>-->
+        <activity
+            android:name=".MyReactActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        </activity>
+
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
+
     </application>
 
 </manifest>
